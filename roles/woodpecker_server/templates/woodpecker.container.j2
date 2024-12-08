@@ -18,7 +18,7 @@ Environment=WOODPECKER_ORGS={{ woodpecker_server_orgs | join(",") }}
 # Forgejo integration
 Environment=WOODPECKER_FORGEJO=true
 Environment=WOODPECKER_FORGEJO_URL={{ woodpecker_server_forgejo_url }}
-{% if woodpecker_server_forgejo_oauth is defined %}
+{% if woodpecker_server_forgejo_client is not defined %}
 Environment=WOODPECKER_FORGEJO_CLIENT={{ woodpecker_server_forgejo_oauth.provider.client_id }}
 {% else %}
 Environment=WOODPECKER_FORGEJO_CLIENT={{ woodpecker_server_forgejo_client }}
