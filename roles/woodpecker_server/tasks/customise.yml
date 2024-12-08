@@ -1,0 +1,76 @@
+---
+
+- name: Ensure customisation folders exist
+  become: true
+  ansible.builtin.file:
+    dest: "{{ item }}"
+    state: directory
+    owner: "{{ fg_forgejo_userid }}"
+    group: "{{ fg_forgejo_groupid }}"
+    mode: "0550"
+    setype: container_file_t
+  with_items:
+    - "{{ fg_forgejo_custom_dir }}templates"
+    - "{{ fg_forgejo_custom_dir }}templates/custom"
+    - "{{ fg_forgejo_custom_dir }}templates/mail"
+    - "{{ fg_forgejo_custom_dir }}public"
+    - "{{ fg_forgejo_custom_dir }}public/assets"
+    - "{{ fg_forgejo_custom_dir }}public/assets/img"
+    - "{{ fg_forgejo_custom_dir }}options"
+    - "{{ fg_forgejo_custom_dir }}options/gitignore"
+    - "{{ fg_forgejo_custom_dir }}options/label"
+    - "{{ fg_forgejo_custom_dir }}options/licence"
+    - "{{ fg_forgejo_custom_dir }}options/locales"
+    - "{{ fg_forgejo_custom_dir }}options/readme"
+
+- name: Copy custom label sets
+  become: true
+  ansible.builtin.copy:
+    src: "{{ item }}"
+    dest: "{{ fg_forgejo_custom_dir }}options/label/{{ item | basename }}"
+    owner: "{{ fg_forgejo_userid }}"
+    group: "{{ fg_forgejo_groupid }}"
+    mode: "0400"
+    setype: container_file_t
+  with_items: "{{ fg_forgejo_labels }}"
+  notify:
+    - Restart forgejo
+
+- name: Copy custom licences
+  become: true
+  ansible.builtin.copy:
+    src: "{{ item }}"
+    dest: "{{ fg_forgejo_custom_dir }}options/licences/{{ item | basename }}"
+    owner: "{{ fg_forgejo_userid }}"
+    group: "{{ fg_forgejo_groupid }}"
+    mode: "0400"
+    setype: container_file_t
+  with_items: "{{ fg_forgejo_licences }}"
+  notify:
+    - Restart forgejo
+
+- name: Copy custom assets
+  become: true
+  ansible.builtin.copy:
+    src: "{{ item.value }}"
+    dest: "{{ fg_forgejo_custom_dir }}public/assets/{{ item.key }}"
+    owner: "{{ fg_forgejo_userid }}"
+    group: "{{ fg_forgejo_groupid }}"
+    mode: "0400"
+    setype: container_file_t
+  loop: "{{ fg_forgejo_assets | dict2items }}"
+  notify:
+    - Restart forgejo
+
+- name: Copy custom templates
+  become: true
+  ansible.builtin.copy:
+    src: "{{ item.value }}"
+    dest: "{{ fg_forgejo_custom_dir }}templates/{{ item.key }}"
+    owner: "{{ fg_forgejo_userid }}"
+    group: "{{ fg_forgejo_groupid }}"
+    mode: "0400"
+    setype: container_file_t
+  loop: "{{ fg_forgejo_templates | dict2items }}"
+  notify:
+    - Restart forgejo

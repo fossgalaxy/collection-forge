@@ -1,0 +1,9 @@
+---
+# handlers file for fg_forgejo
+
+- name: "Restart woodpecker"
+  become: true
+  ansible.builtin.service:
+    name: woodpecker_server
+    state: restarted
+

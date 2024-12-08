@@ -1,0 +1,15 @@
+---
+# tasks file for fg_forgejo
+
+- name: Install woodpecker server
+  ansible.builtin.include_tasks: install.yml
+
+- name: Include database-related tasks
+  ansible.builtin.include_tasks: postgres.yml
+  when: woodpecker_server_db_manage
+
+- name: Ensure service is running
+  become: true
+  ansible.builtin.service:
+    name: woodpecker_server
+    state: started

@@ -1,0 +1,25 @@
+[Unit]
+Description=Woodpecker - CI server
+After=local-fs.target
+
+[Container]
+Image={{ woodpecker_server_image }}
+
+PublishPort={{ woodpecker_server_web_port }}:8000
+Environment=WOODPECKER_HOST={{ woodpecker_server_web_url }}
+
+# Forgejo integration
+Environment=WOODPECKER_FORGEJO=true
+Environment=WOODPECKER_FORGEJO_URL={{ woodpecker_server_forgejo_url }}
+
+# volumes
+Volume={{ woodpecker_server_config_volume }}.volume:/var/lib/woodpecker
+
+# Secrets
+Secret=woodpecker-agent-key,type=env,target=WOODPECKER_AGENT_SECRET
+
+[Service]
+Restart=always
+
+[Install]
+WantedBy=default.target

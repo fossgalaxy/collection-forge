@@ -1,0 +1,24 @@
+---
+
+# systemd integration
+woodpecker_server_service_dir: "/etc/containers/systemd/"
+woodpecker_server_config_volume: "woodpecker-server-config"
+
+# version infomation
+woodpecker_server_version: "latest"
+woodpecker_server_image: "docker.io/woodpeckerci/woodpecker-server:{{ woodpecker_server_version }}"
+
+# database settings (only postgres is supported)
+woodpecker_server_db_manage: true
+woodpecker_server_db_host: "host.containers.internal"
+woodpecker_server_db_name: "woodpecker"
+woodpecker_server_db_user: "woodpecker_app"
+woodpecker_server_db_password: ""
+
+# web details
+woodpecker_server_web_port: 3001 # bind (host) port
+woodpecker_server_web_url: "http://{{ inventory_hostname }}:{{ woodpecker_server_web_port }}/"
+
+# Forgejo integration
+woodpecker_server_forgejo_url: "{{ fg_forgejo_web_url }}"
+

@@ -1,0 +1,30 @@
+---
+
+- name: Create agent key
+  become: true
+  containers.podman.podman_secret:
+    state: present
+    name: woodpecker-agent-key
+    data: "{{ woodpecker_server_agent_key }}"
+
+- name: Create volume quadlet
+  become: true
+  ansible.builtin.template:
+    src: woodpecker.volume.j2
+    dest: "{{ woodpecker_server_service_dir }}{{woodpecker_server_config_volume}}.volume"
+    mode: "0400"
+  vars:
+    volume_name: configuration
+  notify:
+    - Reload systemd units
+    - Restart woodpecker
+
+- name: Create container quadlet
+  become: true
+  ansible.builtin.template:
+    src: woodpecker.container.j2
+    dest: "{{ woodpecker_server_service_dir }}woodpecker_server.container"
+    mode: "0400"
+  notify:
+    - Reload systemd units
+    - Restart woodpecker
