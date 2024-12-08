@@ -31,7 +31,6 @@
     state: directory
     owner: "{{ fg_forgejo_userid }}"
     group: "{{ fg_forgejo_groupid }}"
-    recurse: true
     mode: "0500"
     setype: container_file_t
   with_items:
