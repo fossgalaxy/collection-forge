@@ -1,8 +1,32 @@
 ---
 # Forgejo integrations
 
+# Mode: automatically fetch token
+- name: Manage oauth application
+  when: woodpecker_server_forgejo_secret is not defined
+  block:
+    - name: Ensure oauth appication exists
+      fossgalaxy.forge.forgejo_oauth:
+        host: "{{ woodpecker_server_forgejo_url }}"
+        auth_token: "{{ woodpecker_server_forgejo_token }}"
+        name: "{{ woodpecker_server_forgejo_name }}"
+        regenerate: "{{ woodpecker_server_forgejo_regenerate }}"
+        redirect_uris:
+          - "{{ woodpecker_server_web_redirect }}"
+      register: woodpecker_server_forgejo_oauth
+
+    - name: Create secret for oauth
+      become: true
+      when: woodpecker_server_forgejo_oauth.changed
+      containers.podman.podman_secret:
+        state: present
+        name: woodpecker-oauth-secret
+        data: "{{ woodpecker_server_forgejo_oauth.provider.client_secret }}"
+
+# Mode: manually set token
 - name: Create secret for oauth
   become: true
+  when: woodpecker_server_forgejo_secret is defined
   containers.podman.podman_secret:
     state: present
     name: woodpecker-oauth-secret
