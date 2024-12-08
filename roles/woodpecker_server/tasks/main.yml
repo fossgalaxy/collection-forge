@@ -1,5 +1,4 @@
 ---
-# tasks file for fg_forgejo
 
 - name: Install woodpecker server
   ansible.builtin.include_tasks: install.yml

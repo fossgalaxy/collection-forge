@@ -1,6 +1,6 @@
 ---
 
-- name: Create agent key
+- name: Create agent key secret
   become: true
   containers.podman.podman_secret:
     state: present
@@ -16,7 +16,7 @@
   vars:
     volume_name: configuration
   notify:
-    - Reload systemd units
+    - Reload woodpecker service
     - Restart woodpecker
 
 - name: Create container quadlet
@@ -26,5 +26,5 @@
     dest: "{{ woodpecker_server_service_dir }}woodpecker_server.container"
     mode: "0400"
   notify:
-    - Reload systemd units
+    - Reload woodpecker service
     - Restart woodpecker

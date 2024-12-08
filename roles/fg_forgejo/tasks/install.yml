@@ -9,7 +9,7 @@
   vars:
     volume_name: data
   notify:
-    - Reload systemd units
+    - Reload forgejo service
     - Restart forgejo
 
 - name: Ensure git volume exists
@@ -21,7 +21,7 @@
   vars:
     volume_name: "git data"
   notify:
-    - Reload systemd units
+    - Reload forgejo service
     - Restart forgejo
 
 - name: Ensure configuration folder exists
@@ -56,7 +56,7 @@
     dest: "{{ fg_forgejo_service_dir }}forgejo.network"
     mode: "0400"
   notify:
-    - Reload systemd units
+    - Reload forgejo service
     - Restart forgejo
 
 - name: Create forgejo container quadlet
@@ -66,5 +66,5 @@
     dest: "{{ fg_forgejo_service_dir }}forgejo.container"
     mode: "0400"
   notify:
-    - Reload systemd units
+    - Reload forgejo service
     - Restart forgejo

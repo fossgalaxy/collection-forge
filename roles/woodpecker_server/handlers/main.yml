@@ -7,3 +7,9 @@
     name: woodpecker_server
     state: restarted
 
+- name: "Reload woodpecker service"
+  become: true
+  ansible.builtin.systemd_service:
+    daemon_reload: true
+    name: woodpecker_server
+    state: reloaded
