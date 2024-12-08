@@ -15,10 +15,17 @@ woodpecker_server_db_name: "woodpecker"
 woodpecker_server_db_user: "woodpecker_app"
 woodpecker_server_db_password: ""
 
+woodpecker_server_db_dsn: "postgres://{{ woodpecker_server_db_user }}:{{ woodpecker_server_db_password }}@{{ woodpecker_server_db_host }}/{{ woodpecker_server_db_name }}?sslmode=disable"
+
 # web details
 woodpecker_server_web_port: 3001 # bind (host) port
 woodpecker_server_web_url: "http://{{ inventory_hostname }}:{{ woodpecker_server_web_port }}/"
 
 # Forgejo integration
 woodpecker_server_forgejo_url: "{{ fg_forgejo_web_url }}"
+woodpecker_server_forgejo_client: "woodpecker_ci"
 
+# registration
+woodpecker_server_allow_registration: true
+woodpecker_server_admins: []
+# woodpecker_server_orgs: []

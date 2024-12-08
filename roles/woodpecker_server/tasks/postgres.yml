@@ -10,13 +10,20 @@
   become: true
   become_user: postgres
   community.postgresql.postgresql_db:
-    name: "{{ fg_forgejo_db_name }}"
+    name: "{{ woodpecker_server_db_name }}"
     encoding: UTF-8
 
 - name: Ensure the database user exists
   become: true
   become_user: postgres
   community.postgresql.postgresql_user:
-    db: "{{ fg_forgejo_db_name }}"
-    name: "{{ fg_forgejo_db_user }}"
-    password: "{{ fg_forgejo_db_password }}"
+    db: "{{ woodpecker_server_db_name }}"
+    name: "{{ woodpecker_server_db_user }}"
+    password: "{{ woodpecker_server_db_password }}"
+
+- name: Create secret for database
+  become: true
+  containers.podman.podman_secret:
+    state: present
+    name: woodpecker-db-dsn
+    data: "{{ woodpecker_server_db_dsn }}"

@@ -8,8 +8,12 @@
   ansible.builtin.include_tasks: postgres.yml
   when: woodpecker_server_db_manage
 
+- name: forgejo integration
+  ansible.builtin.include_tasks: forgejo.yml
+
 - name: Ensure service is running
   become: true
   ansible.builtin.service:
     name: woodpecker_server
     state: started
+

@@ -1,0 +1,9 @@
+---
+# Forgejo integrations
+
+- name: Create secret for oauth
+  become: true
+  containers.podman.podman_secret:
+    state: present
+    name: woodpecker-oauth-secret
+    data: "{{ woodpecker_server_forgejo_secret }}"
