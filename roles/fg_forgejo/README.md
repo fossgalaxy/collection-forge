@@ -1,3 +1,6 @@
+NOTE: I've migrated this to a [collection](https://github.com/fossgalaxy/collection-forge) - for future
+work please see there.
+
 Forgejo (FOSS Galaxy)
 =========
 
