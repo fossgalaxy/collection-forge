@@ -1,0 +1,65 @@
+labels:
+  - name: 'status/Confirmed'
+    exclusive: true
+    color: 0e8a16
+    description:
+  - name: 'status/Review Needed'
+    exclusive: true
+    color: EAE435
+    description:
+  - name: 'status/Complete'
+    exclusive: true
+    color: 7ED321
+    description:
+  - name: 'status/Feedback Needed'
+    exclusive: true
+    color: 006b75
+    description:
+  - name: 'status/On Hold'
+    exclusive: true
+    color: BABABA
+    description:
+  - name: 'status/In Progress'
+    exclusive: true
+    color: FC8264
+    description:
+  - name: 'type/Question'
+    exclusive: true
+    color: FF6DD9
+    description:
+  - name: 'type/Feature'
+    exclusive: true
+    color: 6DFF6D
+    description:
+  - name: 'type/Idea'
+    exclusive: true
+    color: 6DE6FF
+    description:
+  - name: 'type/Bug'
+    exclusive: true
+    color: ff2222
+    description:
+  - name: 'type/Enhancement'
+    exclusive: true
+    color: 1d76db
+    description:
+  - name: 'type/Help Needed'
+    exclusive: true
+    color: 5319e7
+    description:
+  - name: 'Priority/Low'
+    exclusive: true
+    color: c2e0c6
+    description:
+  - name: 'Priority/Medium'
+    exclusive: true
+    color: fbca04
+    description:
+  - name: 'Priority/High'
+    exclusive: true
+    color: FF7922
+    description:
+  - name: 'Priority/Critical'
+    exclusive: true
+    color: ff2222
+    description:

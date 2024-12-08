@@ -1,0 +1,45 @@
+---
+# defaults file for fg_forgejo
+
+# version infomation
+fg_forgejo_version: "9"
+fg_forgejo_image: "codeberg.org/forgejo/forgejo:{{ fg_forgejo_version }}"
+
+# podman container integration
+fg_forgejo_service_dir: "/etc/containers/systemd/"
+fg_forgejo_custom_dir: "/srv/forgejo/custom/"
+
+# user ids
+fg_forgejo_userid: 1000
+fg_forgejo_groupid: 1000
+
+# database settings (only postgres is supported)
+fg_forgejo_db_manage: true
+fg_forgejo_db_host: "host.containers.internal"
+fg_forgejo_db_name: "forgejo"
+fg_forgejo_db_user: "forgejo_app"
+fg_forgejo_db_password: ""
+
+##
+# Config Settings
+##
+
+# Branding
+fg_forgejo_name: forgejo
+fg_forgejo_slogan: "Beyond coding. We Forge."
+fg_forgejo_domain: "{{ inventory_hostname }}"
+fg_forgejo_domain_noreply: "noreply.{{ fg_forgejo_domain }}"
+
+# port bindings
+fg_forgejo_web_port: 3000 # bind (host) port
+fg_forgejo_web_url: "https://{{ fg_forgejo_domain }}/"
+
+fg_forgejo_ssh_port: 222 # bind (host) port
+fg_forgejo_ssh_domain: "{{ fg_forgejo_domain }}"
+
+# Customisation Points
+fg_forgejo_licences_preferred: []
+fg_forgejo_licences: []
+fg_forgejo_labels: []
+fg_forgejo_assets: {}
+fg_forgejo_templates: {}

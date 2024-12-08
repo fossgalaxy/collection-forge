@@ -1,0 +1,21 @@
+---
+# tasks file for fg_forgejo
+
+- name: Setup secrets
+  ansible.builtin.include_tasks: secret.yml
+
+- name: Install forgejo
+  ansible.builtin.include_tasks: install.yml
+
+- name: Include customisations
+  ansible.builtin.include_tasks: customise.yml
+
+- name: Include database-related tasks
+  ansible.builtin.include_tasks: postgres.yml
+  when: fg_forgejo_db_manage
+
+- name: Ensure service is running
+  become: true
+  ansible.builtin.service:
+    name: forgejo
+    state: started

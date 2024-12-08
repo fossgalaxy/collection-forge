@@ -1,0 +1,31 @@
+[Unit]
+Description=Forgejo - Git Server
+After=local-fs.target
+
+[Container]
+Image={{ fg_forgejo_image }}
+Network=forgejo.network
+Environment=USER_UID={{ fg_forgejo_userid }}
+Environment=USER_GID={{ fg_forgejo_groupid }}
+PublishPort={{ fg_forgejo_web_port }}:3000
+PublishPort={{ fg_forgejo_ssh_port }}:22
+
+# volumes
+Volume=forgejo-data.volume:/data
+Volume=forgejo-git.volume:/data/git
+
+# Custom integration point
+Environment=FORGEJO_CUSTOM=/data/custom
+Volume={{ fg_forgejo_custom_dir }}:/data/custom:Z
+
+# Secrets
+Secret=forgejo-secret-key,uid={{ fg_forgejo_userid }}
+Secret=forgejo-token-internal,uid={{ fg_forgejo_userid }}
+Secret=forgejo-jwt-oauth,uid={{ fg_forgejo_userid }}
+Secret=forgejo-jwt-lfs,uid={{ fg_forgejo_userid }}
+
+[Service]
+Restart=always
+
+[Install]
+WantedBy=default.target
