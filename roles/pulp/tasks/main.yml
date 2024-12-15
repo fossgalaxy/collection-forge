@@ -1,0 +1,26 @@
+---
+
+- name: Install pulp
+  ansible.builtin.include_tasks: install.yml
+
+- name: Include database-related tasks
+  ansible.builtin.include_tasks: postgres.yml
+  when: pulp_db_manage
+
+- name: Ensure api services is running
+  become: true
+  ansible.builtin.service:
+    name: pulp_api
+    state: started
+
+- name: Ensure content services is running
+  become: true
+  ansible.builtin.service:
+    name: pulp_content
+    state: started
+
+- name: Ensure worker services is running
+  become: true
+  ansible.builtin.service:
+    name: pulp_worker
+    state: started

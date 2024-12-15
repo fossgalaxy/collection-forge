@@ -1,0 +1,45 @@
+---
+
+- name: Ensure the postgresql library is available on the host
+  become: true
+  ansible.builtin.dnf:
+    name: python3-psycopg2
+    state: installed
+
+- name: Ensure the posgresql-contrib package is installed
+  become: true
+  ansible.builtin.dnf:
+    name: postgresql-contrib
+    state: installed
+
+- name: Ensure the database exists
+  become: true
+  become_user: postgres
+  community.postgresql.postgresql_db:
+    name: "{{ pulp_db_name }}"
+    encoding: UTF-8
+
+- name: Ensure the database user exists
+  become: true
+  become_user: postgres
+  community.postgresql.postgresql_user:
+    db: "{{ pulp_db_name }}"
+    name: "{{ pulp_db_user }}"
+    password: "{{ pulp_db_password }}"
+
+- name: Ensure the hstore extention is installed
+  become: true
+  become_user: postgres
+  community.postgresql.postgresql_ext:
+    name: hstore
+    db: "{{ pulp_db_name }}"
+
+- name: Do database migrations
+  become: true
+  ansible.builtin.shell: |
+    podman run --rm \
+      -v "{{ pulp_custom_dir }}/settings.py:/etc/pulp/settings.py:z" \
+      -v "{{ pulp_cert_dir }}:/etc/pulp/certs:z" \
+      -v "{{ pulp_config_volume }}.volume:/var/lib/pulp" \
+      {{ pulp_base_image }} \
+      pulpcore-manager migrate --noinput

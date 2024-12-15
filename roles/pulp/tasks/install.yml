@@ -1,0 +1,90 @@
+---
+
+- name: Ensure volume quadlet exists
+  become: true
+  containers.podman.podman_volume:
+    name: "{{ pulp_config_volume }}"
+    state: quadlet
+    quadlet_dir: "{{ pulp_service_dir }}"
+
+- name: Ensure configuration folder exists
+  become: true
+  ansible.builtin.file:
+    dest: "{{ item }}"
+    state: directory
+    owner: "{{ pulp_userid }}"
+    group: "{{ pulp_groupid }}"
+    mode: "0500"
+    setype: container_file_t
+  with_items:
+    - "{{ pulp_custom_dir }}"
+    - "{{ pulp_cert_dir }}"
+
+- name: Provide database encryption key
+  become: true
+  ansible.builtin.template:
+    src: key.j2
+    dest: "{{ pulp_cert_dir }}database_fields.symmetric.key"
+    owner: "{{ pulp_userid }}"
+
+- name: Provide customised config
+  become: true
+  ansible.builtin.template:
+    src: settings.py.j2
+    dest: "{{ pulp_custom_dir }}/settings.py"
+    owner: "{{ fg_forgejo_userid }}"
+    group: "{{ fg_forgejo_groupid }}"
+    mode: "0400"
+    setype: container_file_t
+
+- name: Ensure api quadlet exists
+  become: true
+  containers.podman.podman_container:
+    name: pulp_api
+    command: pulp-api
+    image: "{{ pulp_api_image }}"
+    ports:
+      - "{{ pulp_api_port }}:{{ pulp_api_port }}"
+    state: quadlet
+    volumes:
+      - "{{ pulp_custom_dir }}/settings.py:/etc/pulp/settings.py:z"
+      - "{{ pulp_cert_dir }}:/etc/pulp/certs:z"
+      - "{{ pulp_config_volume }}.volume:/var/lib/pulp"
+    quadlet_options:
+      - |
+        [Install]
+        WantedBy=default.target
+
+- name: Ensure content quadlet exists
+  become: true
+  containers.podman.podman_container:
+    name: pulp_content
+    command: pulp-content
+    image: "{{ pulp_content_image }}"
+    ports:
+      - "{{ pulp_content_port }}:{{ pulp_content_port }}"
+    state: quadlet
+    volumes:
+      - "{{ pulp_custom_dir }}/settings.py:/etc/pulp/settings.py:z"
+      - "{{ pulp_cert_dir }}:/etc/pulp/certs:z"
+      - "{{ pulp_config_volume }}.volume:/var/lib/pulp"
+    quadlet_options:
+      - |
+        [Install]
+        WantedBy=default.target
+
+- name: Ensure worker quadlet exists
+  become: true
+  containers.podman.podman_container:
+    name: pulp_worker
+    command: pulp-worker
+    image: "{{ pulp_worker_image }}"
+    state: quadlet
+    volumes:
+      - "{{ pulp_custom_dir }}/settings.py:/etc/pulp/settings.py:z"
+      - "{{ pulp_cert_dir }}:/etc/pulp/certs:z"
+      - "{{ pulp_config_volume }}.volume:/var/lib/pulp"
+    quadlet_options:
+      - |
+        [Install]
+        WantedBy=default.target

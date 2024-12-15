@@ -5,22 +5,41 @@ pulp_service_prefix: 'pulp'
 pulp_service_dir: "/etc/containers/systemd/"
 pulp_config_volume: "{{ pulp_service_prefix }}-config"
 
+pulp_custom_dir: "/srv/pulp/"
+pulp_cert_dir: "/srv/pulp/certs/"
+
 # version infomation
 pulp_version: "stable"
 pulp_base_image: "ghcr.io/pulp/pulp-minimal:{{ pulp_version }}"
 
+# user ids
+pulp_userid: 700
+pulp_groupid: 700
+
 # pulp multi-image image
 pulp_web: true
+pulp_web_port: 8080
 pulp_web_image: "ghcr.io/pulp/pulp-web:{{ pulp_version }}"
 
 pulp_api: true
 pulp_api_image: "{{ pulp_base_image }}"
 pulp_api_command: 'pulp-api'
+pulp_api_port: 24817
 
 pulp_content: true
 pulp_content_image: "{{ pulp_base_image }}"
 pulp_content_command: 'pulp-content'
+pulp_content_port: 24816
 
 pulp_worker: true
 pulp_worker_image: "{{ pulp_base_image }}"
 pulp_worker_command: 'pulp-worker'
+
+# database
+pulp_db_manage: true
+pulp_db_host: "host.containers.internal"
+pulp_db_name: "pulp"
+pulp_db_user: "pulp_app"
+
+#pulp_db_key: ""
+
