@@ -1,0 +1,12 @@
+---
+
+# NOTE: WIP, not usable.
+
+- name: Ensure migration has been performed
+  podman_container:
+    command: pulpcore-manager migrate --noinput
+    volumes:
+      - "settings:/etc/pulp/settings.py:z"
+      - "certs:/etc/pulp/certs:z"
+      - "pulp.volume:/var/lib/pulp"
+

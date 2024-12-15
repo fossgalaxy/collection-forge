@@ -1,0 +1,26 @@
+---
+
+# systemd integration
+pulp_service_prefix: 'pulp'
+pulp_service_dir: "/etc/containers/systemd/"
+pulp_config_volume: "{{ pulp_service_prefix }}-config"
+
+# version infomation
+pulp_version: "stable"
+pulp_base_image: "ghcr.io/pulp/pulp-minimal:{{ pulp_version }}"
+
+# pulp multi-image image
+pulp_web: true
+pulp_web_image: "ghcr.io/pulp/pulp-web:{{ pulp_version }}"
+
+pulp_api: true
+pulp_api_image: "{{ pulp_base_image }}"
+pulp_api_command: 'pulp-api'
+
+pulp_content: true
+pulp_content_image: "{{ pulp_base_image }}"
+pulp_content_command: 'pulp-content'
+
+pulp_worker: true
+pulp_worker_image: "{{ pulp_base_image }}"
+pulp_worker_command: 'pulp-worker'
