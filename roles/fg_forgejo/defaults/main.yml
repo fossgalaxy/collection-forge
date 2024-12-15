@@ -43,3 +43,11 @@ fg_forgejo_licences: []
 fg_forgejo_labels: []
 fg_forgejo_assets: {}
 fg_forgejo_templates: {}
+
+# integrations
+fg_forgejo_caddy: false
+fg_forgejo_caddy_network: "caddy-ingress"
+fg_forgejo_caddy_labels:
+  caddy: "{{ forgejo_domain }}:80"
+  caddy.reverse_proxy: "{% raw %}{{ upstreams 3000 }}{% endraw %}"
+

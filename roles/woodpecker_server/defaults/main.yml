@@ -18,8 +18,10 @@ woodpecker_server_db_user: "woodpecker_app"
 woodpecker_server_db_dsn: "postgres://{{ woodpecker_server_db_user }}:{{ woodpecker_server_db_password }}@{{ woodpecker_server_db_host }}/{{ woodpecker_server_db_name }}?sslmode=disable"
 
 # web details
+woodpecker_server_domain: "{{ inventory_hostname }}"
+
 woodpecker_server_web_port: 3001 # bind (host) port
-woodpecker_server_web_url: "http://{{ inventory_hostname }}:{{ woodpecker_server_web_port }}/"
+woodpecker_server_web_url: "http://{{ woodpecker_server_domain }}:{{ woodpecker_server_web_port }}/"
 woodpecker_server_web_redirect: "{{ woodpecker_server_web_url }}authorize"
 
 # Forgejo integration
@@ -35,3 +37,10 @@ woodpecker_server_forgejo_regenerate: false
 woodpecker_server_allow_registration: true
 woodpecker_server_admins: []
 # woodpecker_server_orgs: []
+
+# caddy integration
+woodpecker_server_caddy: false
+woodpecker_server_caddy_network: "caddy-ingress"
+woodpecker_server_caddy_labels:
+  caddy: "{{ woodpecker_server_domain }}:{{ woodpecker_server_port }}"
+  caddy.reverse_proxy: "{% raw %}{{ upstreams 8000 }}{% endraw %}"
