@@ -1,0 +1,29 @@
+---
+
+- name: Ensure the postgresql library is available on the host
+  become: true
+  ansible.builtin.dnf:
+    name: python3-psycopg2
+    state: installed
+
+- name: Ensure the database exists
+  become: true
+  become_user: postgres
+  community.postgresql.postgresql_db:
+    name: "{{ tagia_db_name }}"
+    encoding: UTF-8
+
+- name: Ensure the database user exists
+  become: true
+  become_user: postgres
+  community.postgresql.postgresql_user:
+    db: "{{ taiga_db_name }}"
+    name: "{{ taiga_db_user }}"
+    password: "{{ taiga_db_password }}"
+
+- name: Create secret for database
+  become: true
+  containers.podman.podman_secret:
+    state: present
+    name: taiga-db-password
+    data: "{{ taiga_db_password }}"

@@ -1,0 +1,80 @@
+---
+
+- name: Ensure static volume quadlet exists
+  become: true
+  containers.podman.podman_image:
+    name: "{{ taiga_volume_static }}"
+    state: quadlet
+    quadlet_dir: "{{ taiga_service_dir }}"
+
+- name: Ensure media volume quadlet exists
+  become: true
+  containers.podman.podman_image:
+    name: "{{ taiga_volume_media }}"
+    state: quadlet
+    quadlet_dir: "{{ taiga_service_dir }}"
+
+- name: Ensure backend container quadlet exists
+  become: true
+  containers.podman.podman_container:
+    name: taiga_back
+    image: "{{ tagia_backend_image }}"
+    state: quadlet
+    volumes:
+      - "{{ taiga_volume_static }}.volume:/taiga-back/static"
+      - "{{ taiga_volume_media }}.volume:/taiga-back/media"
+    secrets:
+      - "taiga-db-password,type=env,target=POSTGRES_PASSWORD"
+      - "taiga-secret-key,type=env,target=TAIGA_SECRET_KEY"
+    quadlet_options:
+      - |
+        [Install]
+        WantedBy=default.target
+  notify:
+    - Reload taiga service
+
+- name: Ensure async container quadlet exists
+  become: true
+  containers.podman.podman_container:
+    name: taiga_async
+    image: "{{ tagia_async_image }}"
+    state: quadlet
+    volumes:
+      - "{{ taiga_volume_static }}.volume:/taiga-back/static"
+      - "{{ taiga_volume_media }}.volume:/taiga-back/media"
+    secrets:
+      - "taiga-db-password,type=env,target=POSTGRES_PASSWORD"
+      - "taiga-secret-key,type=env,target=TAIGA_SECRET_KEY"
+    quadlet_options:
+      - |
+        [Install]
+        WantedBy=default.target
+  notify:
+    - Reload taiga service
+
+- name: Ensure events container quadlet exists
+  become: true
+  containers.podman.podman_container:
+    name: taiga_events
+    image: "{{ tagia_events_image }}"
+    state: quadlet
+    secrets:
+      - "taiga-rabbitmq-password,type=env,target=RABBITMQ_PASS"
+      - "taiga-secret-key,type=env,target=TAIGA_SECRET_KEY"
+    quadlet_options:
+      - |
+        [Install]
+        WantedBy=default.target
+  notify:
+    - Reload taiga events
+
+- name: Ensure protected container quadlet exists
+  become: true
+  containers.podman.podman_container:
+    name: taiga_projected
+    image: "{{ tagia_protected_image }}"
+    state: quadlet
+    quadlet_options:
+      - |
+        [Install]
+        WantedBy=default.target

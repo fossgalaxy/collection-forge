@@ -1,0 +1,57 @@
+---
+
+# version infomation
+taiga_version: "latest"
+
+tagia_backend_image: "docker.io/taigaio/taiga-back:{{ taiga_version }}"
+tagia_backend_port: 8000
+
+tagia_events_image: "docker.io/taigaio/taiga-events:{{ taiga_version }}"
+tagia_events_port: 8888
+
+tagia_protected_image: "docker.io/taigaio/taiga-protected:{{ taiga_version }}"
+tagia_protected_port: 8003
+
+tagia_async_image: "{{ taiga_backend_image }}"
+tagia_frontend_image: "docker.io/taigaio/taiga-front:{{ taiga_version }}"
+
+# volume names
+taiga_volume_static: "taiga-static"
+taiga_volume_media: "taiga-media"
+
+# Database settings
+taiga_db_manage: true
+taiga_db_host: "host.containers.internal"
+taiga_db_name: "taiga"
+taiga_db_user: "taiga_app"
+
+# RabbitMQ
+tagia_rabbitmq_vhost: "taiga"
+taiga_rabbitmq_user: "tagia_app"
+
+# Secrets
+# taiga_secret_key: ""
+# taiga_db_password: ""
+# taiga_rabbitmq_pass: ""
+# taiga_email_password: ""
+
+# sites
+taiga_sites_scheme: "https"
+taiga_sites_domain: "{{ ansible_host }}"
+taiga_subpath: ''
+
+taiga_ws_scheme: "wss"
+
+# email settings
+taiga_email_backend: "django.core.mail.backends.smtp.EmailBackend"
+taiga_email_from: "noreply@{{ tagia_sites_domain }}"
+taiga_email_tls: true
+taiga_email_ssl: false
+taiga_email_host: "{{ ansible_host }}"
+taiga_email_port: 587
+taiga_email_user: ""
+
+taiga_attachments_token_expire: 360
+
+# disable telemetry
+taiga_telemetry: false
