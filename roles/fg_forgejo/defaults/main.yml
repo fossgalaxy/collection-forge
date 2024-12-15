@@ -18,7 +18,7 @@ fg_forgejo_db_manage: true
 fg_forgejo_db_host: "host.containers.internal"
 fg_forgejo_db_name: "forgejo"
 fg_forgejo_db_user: "forgejo_app"
-fg_forgejo_db_password: ""
+#fg_forgejo_db_password: ""
 
 ##
 # Config Settings

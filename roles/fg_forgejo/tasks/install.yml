@@ -2,24 +2,20 @@
 
 - name: Create forgejo volume quadlet
   become: true
-  ansible.builtin.template:
-    src: forgejo.volume.j2
-    dest: "{{ fg_forgejo_service_dir }}forgejo-data.volume"
-    mode: "0400"
-  vars:
-    volume_name: data
+  containers.podman.podman_volume:
+    state: quadlet
+    name: forgejo-data
+    quadlet_dir: "{{ fg_forgejo_service_dir }}"
   notify:
     - Reload forgejo service
     - Restart forgejo
 
 - name: Ensure git volume exists
   become: true
-  ansible.builtin.template:
-    src: forgejo.volume.j2
-    dest: "{{ fg_forgejo_service_dir }}forgejo-git.volume"
-    mode: "0400"
-  vars:
-    volume_name: "git data"
+  containers.podman.podman_volume:
+    state: quadlet
+    name: forgejo-git
+    quadlet_dir: "{{ fg_forgejo_service_dir }}"
   notify:
     - Reload forgejo service
     - Restart forgejo
@@ -51,20 +47,38 @@
 
 - name: Create forgejo network quadlet
   become: true
-  ansible.builtin.template:
-    src: forgejo.network.j2
-    dest: "{{ fg_forgejo_service_dir }}forgejo.network"
-    mode: "0400"
+  containers.podman.podman_network:
+    name: "forgejo"
+    state: quadlet
+    quadlet_dir: "{{ fg_forgejo_service_dir }}"
   notify:
     - Reload forgejo service
     - Restart forgejo
 
 - name: Create forgejo container quadlet
   become: true
-  ansible.builtin.template:
-    src: forgejo.container.j2
-    dest: "{{ fg_forgejo_service_dir }}forgejo.container"
-    mode: "0400"
-  notify:
-    - Reload forgejo service
-    - Restart forgejo
+  containers.podman.podman_container:
+    name: forgejo
+    image: "{{ fg_forgejo_image }}"
+    state: quadlet
+    network: forgejo.network
+    env:
+      USER_UID: "{{ fg_forgejo_userid }}"
+      USER_GID: "{{ fg_forgejo_groupid }}"
+      FORGEJO_CUSTOM: "/data/custom"
+    ports:
+      - "{{ fg_forgejo_web_port }}:3000"
+      - "{{ fg_forgejo_ssh_port }}:22"
+    volumes:
+      - "forgejo-data.volume:/data"
+      - "forgejo-git.volume:/data/git"
+      - "{{ fg_forgejo_custom_dir }}:/data/custom:Z"
+    secrets:
+      - "forgejo-secret-key,uid={{ fg_forgejo_userid }}"
+      - "forgejo-token-internal,uid={{ fg_forgejo_userid }}"
+      - "forgejo-jwt-oauth,uid={{ fg_forgejo_userid }}"
+      - "forgejo-jwt-lfs,uid={{ fg_forgejo_userid }}"
+    quadlet_options:
+      - |
+        [Install]
+        WantedBy=default.target
