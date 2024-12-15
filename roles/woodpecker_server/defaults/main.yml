@@ -13,7 +13,7 @@ woodpecker_server_db_manage: true
 woodpecker_server_db_host: "host.containers.internal"
 woodpecker_server_db_name: "woodpecker"
 woodpecker_server_db_user: "woodpecker_app"
-woodpecker_server_db_password: ""
+#woodpecker_server_db_password: ""
 
 woodpecker_server_db_dsn: "postgres://{{ woodpecker_server_db_user }}:{{ woodpecker_server_db_password }}@{{ woodpecker_server_db_host }}/{{ woodpecker_server_db_name }}?sslmode=disable"
 
@@ -27,9 +27,6 @@ woodpecker_server_forgejo_url: "{{ fg_forgejo_web_url }}"
 woodpecker_server_forgejo_name: "woodpecker_ci"
 woodpecker_server_forgejo_regenerate: false
 
-# set this to automatically configure oauth
-#woodpecker_server_forgejo_token: ""
-# -or-
 # set this to manually configure oauth
 #woodpecker_server_forgejo_client: ""
 #woodpecker_server_forgejo_secret: ""
