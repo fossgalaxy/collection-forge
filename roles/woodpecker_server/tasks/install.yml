@@ -7,24 +7,43 @@
     name: woodpecker-agent-key
     data: "{{ woodpecker_server_agent_key }}"
 
-- name: Create volume quadlet
+- name: Ensure configuration volume quadlet exists
   become: true
-  ansible.builtin.template:
-    src: woodpecker.volume.j2
-    dest: "{{ woodpecker_server_service_dir }}{{woodpecker_server_config_volume}}.volume"
-    mode: "0400"
-  vars:
-    volume_name: configuration
+  containers.podman.podman_image:
+    name: "{{ woodpecker_server_config_volume }}"
+    state: quadlet
+    quadlet_dir: "{{ woodpecker_server_service_dir }}"
   notify:
     - Reload woodpecker service
-    - Restart woodpecker
 
-- name: Create container quadlet
+- name: Ensure container quadlet exists
   become: true
-  ansible.builtin.template:
-    src: woodpecker.container.j2
-    dest: "{{ woodpecker_server_service_dir }}woodpecker_server.container"
-    mode: "0400"
+  containers.podman.podman_container:
+    name: woodpecker_server
+    image: "{{ woodpecker_server_image }}"
+    state: quadlet
+    env:
+      WOODPECKER_HOST: "{{ woodpecker_server_web_url }}"
+      WOODPECKER_OPEN: "{{ woodpecker_server_allow_registration }}"
+      WOODPECKER_ADMIN: "{{ woodpecker_server_admins | join(',') }}"
+      #WOODPECKER_ORGS: "{{ woodpecker_server_orgs | join(',') }}"
+      WOODPECKER_FORGEJO: true
+      WOODPECKER_FORGEJO_URL: "{{ woodpecker_server_forgejo_url }}"
+      WOODPECKER_FORGEJO_CLIENT: "{{ woodpecker_server_forgejo_client }}"
+      WOODPECKER_FORGEJO_SECRET_FILE: "/run/secrets/woodpecker-oauth-secret"
+      WOODPECKER_DATABASE_DRIVER: postgres
+      FORGEJO_CUSTOM: "/data/custom"
+    ports:
+      - "{{ woodpecker_server_web_port }}:8000"
+    volumes:
+      - "{{ woodpecker_server_config_volume }}.volume:/var/lib/woodpecker"
+    secrets:
+      - "woodpecker-oauth-secret"
+      - "woodpecker-agent-key,type=env,target=WOODPECKER_AGENT_SECRET"
+      - "woodpecker-db-dsn,type=env,target=WOODPECKER_DATABASE_DATASOURCE"
+    quadlet_options:
+      - |
+        [Install]
+        WantedBy=default.target
   notify:
     - Reload woodpecker service
-    - Restart woodpecker
