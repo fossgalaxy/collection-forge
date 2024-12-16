@@ -34,7 +34,7 @@
       WOODPECKER_DATABASE_DRIVER: postgres
       FORGEJO_CUSTOM: "/data/custom"
     ports:
-      - "{{ woodpecker_server_web_port }}:8000"
+      - "{{ woodpecker_server_web_port_map }}:8000"
     volumes:
       - "{{ woodpecker_server_config_volume }}.volume:/var/lib/woodpecker"
     secrets:

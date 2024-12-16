@@ -34,6 +34,10 @@ fg_forgejo_domain_noreply: "noreply.{{ fg_forgejo_domain }}"
 fg_forgejo_web_port: 3000 # bind (host) port
 fg_forgejo_web_url: "https://{{ fg_forgejo_domain }}/"
 
+# should we bind to localhost?
+fg_forgejo_expose_web_port: false
+fg_forgejo_web_port_map: "{% if not fg_forgejo_expose_web_port %}127.0.0.1:{% endif %}{{ fg_forgejo_web_port }}"
+
 fg_forgejo_ssh_port: 222 # bind (host) port
 fg_forgejo_ssh_domain: "{{ fg_forgejo_domain }}"
 
@@ -53,7 +57,7 @@ fg_forgejo_caddy_labels:
 
 # reverse proxy: nginx
 fg_forgejo_nginx: true
-fg_forgejo_nginx_upstream: "http://localhost:{{ fg_forgejo_web_port }}"
+fg_forgejo_nginx_upstream: "http://127.0.0.1:{{ fg_forgejo_web_port }}"
 fg_forgejo_nginx_conf: "/etc/nginx/conf.d/30-forgejo.conf"
 fg_forgejo_ssl_cert: "/etc/pki/tls/certs/{{ fg_forgejo_domain }}.pem"
 fg_forgejo_ssl_key: "/etc/pki/tls/private/{{ fg_forgejo_domain }}.pem"

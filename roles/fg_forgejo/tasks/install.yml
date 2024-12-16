@@ -67,7 +67,7 @@
       USER_GID: "{{ fg_forgejo_groupid }}"
       FORGEJO_CUSTOM: "/data/custom"
     ports:
-      - "{{ fg_forgejo_web_port }}:3000"
+      - "{{ fg_forgejo_web_port_map }}:3000"
       - "{{ fg_forgejo_ssh_port }}:22"
     volumes:
       - "forgejo-data.volume:/data"

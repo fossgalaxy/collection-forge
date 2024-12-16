@@ -24,6 +24,10 @@ woodpecker_server_web_port: 3001 # bind (host) port
 woodpecker_server_web_url: "http://{{ woodpecker_server_domain }}:{{ woodpecker_server_web_port }}/"
 woodpecker_server_web_redirect: "{{ woodpecker_server_web_url }}authorize"
 
+# should we bind to localhost?
+woodpecker_server_expose_web_port: false
+woodpecker_server_web_port_map: "{% if not woodpecker_server_expose_web_port %}127.0.0.1:{% endif %}{{ woodpecker_server_web_port }}"
+
 # Forgejo integration
 woodpecker_server_forgejo_url: "{{ fg_forgejo_web_url }}"
 woodpecker_server_forgejo_name: "woodpecker_ci"
@@ -47,7 +51,7 @@ woodpecker_server_caddy_labels:
 
 # reverse proxy: nginx
 woodpecker_server_nginx: true
-woodpecker_server_nginx_upstream: "http://localhost:{{ woodpecker_server_web_port }}"
+woodpecker_server_nginx_upstream: "http://127.0.0.1:{{ woodpecker_server_web_port }}"
 woodpecker_server_nginx_conf: "/etc/nginx/conf.d/30-woodpecker.conf"
 woodpecker_server_ssl_cert: "/etc/pki/tls/certs/{{ woodpecker_server_domain }}.pem"
 woodpecker_server_ssl_key: "/etc/pki/tls/private/{{ woodpecker_server_domain }}.pem"
