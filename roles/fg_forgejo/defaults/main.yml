@@ -53,6 +53,7 @@ fg_forgejo_caddy_labels:
 
 # reverse proxy: nginx
 fg_forgejo_nginx: true
+fg_forgejo_nginx_upstream: "http://localhost:{{ fg_forgejo_web_port }}"
 fg_forgejo_nginx_conf: "/etc/nginx/conf.d/30-forgejo.conf"
 fg_forgejo_ssl_cert: "/etc/pki/tls/certs/{{ fg_forgejo_domain }}.pem"
 fg_forgejo_ssl_key: "/etc/pki/tls/private/{{ fg_forgejo_domain }}.pem"

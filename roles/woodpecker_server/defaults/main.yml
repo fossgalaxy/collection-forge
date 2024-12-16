@@ -47,6 +47,7 @@ woodpecker_server_caddy_labels:
 
 # reverse proxy: nginx
 woodpecker_server_nginx: true
+woodpecker_server_nginx_upstream: "http://localhost:{{ woodpecker_server_web_port }}"
 woodpecker_server_nginx_conf: "/etc/nginx/conf.d/30-woodpecker.conf"
 woodpecker_server_ssl_cert: "/etc/pki/tls/certs/{{ woodpecker_server_domain }}.pem"
 woodpecker_server_ssl_key: "/etc/pki/tls/private/{{ woodpecker_server_domain }}.pem"

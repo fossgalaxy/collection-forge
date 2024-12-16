@@ -20,7 +20,7 @@ server {
 
 	# pass requests off to forgejo
 	location / {
-		proxy_pass http://localhost:{{ fg_forgejo_web_port }};
+		proxy_pass {{ fg_forgejo_nginx_upstream }};
 
 		proxy_set_header Connection $http_connection;
 		proxy_set_header Upgrade $http_upgrade;
