@@ -1,0 +1,16 @@
+---
+# drop-in support for an nginx proxy
+
+- name: Ensure the vhost template exists
+  become: true
+  ansible.builtin.template:
+    src: vhost.j2
+    dest: "{{ fg_forgejo_nginx_conf }}"
+  when: "fg_forgejo_nginx"
+
+- name: Ensure the vhost does not exist
+  become: true
+  ansible.builtin.template:
+    path: "{{ fg_forgejo_nginx_conf }}"
+    state: absent
+  when: "not fg_forgejo_nginx"

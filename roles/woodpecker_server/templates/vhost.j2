@@ -1,0 +1,38 @@
+server {
+	listen 443 ssl http2;
+	listen [::]:443 ssl http2;
+
+	server_name {{ woodpecker_server_domain }};
+
+	# ssl setup
+        ssl_certificate "{{ woodpecker_server_ssl_cert }}";
+        ssl_certificate_key "{{ woodpecker_server_ssl_key }}";
+        ssl_session_cache shared:SSL:1m;
+        ssl_session_timeout  10m;
+        ssl_ciphers PROFILE=SYSTEM;
+        ssl_prefer_server_ciphers on;
+
+	# Pretty error pages
+	error_page 502 503 /50x.html;
+	location = /50x.html {
+		root /usr/share/nginx/html;
+	}
+
+	# pass requests off to woodpecker_server
+	location / {
+		proxy_set_header Host $host;
+		proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+		proxy_set_header X-Forwarded-Proto $scheme;
+
+		proxy_pass http://localhost:{{ woodpecker_server_web_port }};
+		proxy_redirect off;
+		proxy_http_version 1.1;
+		proxy_buffering off;
+
+		# woodpecker docs don't mention these...
+		# proxy_set_header Connection $http_connection;
+		# proxy_set_header Upgrade $http_upgrade;
+
+		chunked_transfer_encoding off;
+	}
+}

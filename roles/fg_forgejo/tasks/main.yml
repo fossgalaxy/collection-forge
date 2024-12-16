@@ -14,6 +14,9 @@
   ansible.builtin.include_tasks: postgres.yml
   when: fg_forgejo_db_manage
 
+- name: Manage nginx configuration
+  ansible.builtin.include_tasks: nginx.yml
+
 - name: Ensure service is running
   become: true
   ansible.builtin.service:

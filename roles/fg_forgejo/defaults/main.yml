@@ -44,10 +44,15 @@ fg_forgejo_labels: []
 fg_forgejo_assets: {}
 fg_forgejo_templates: {}
 
-# integrations
+# reverse proxy: caddy
 fg_forgejo_caddy: false
 fg_forgejo_caddy_network: "caddy-ingress"
 fg_forgejo_caddy_labels:
   caddy: "{{ forgejo_domain }}:80"
   caddy.reverse_proxy: "{% raw %}{{ upstreams 3000 }}{% endraw %}"
 
+# reverse proxy: nginx
+fg_forgejo_nginx: true
+fg_forgejo_nginx_conf: "/etc/nginx/conf.d/30-forgejo.conf"
+fg_forgejo_ssl_cert: "/etc/pki/tls/certs/{{ fg_forgejo_domain }}.pem"
+fg_forgejo_ssl_key: "/etc/pki/tls/private/{{ fg_forgejo_domain }}.pem"

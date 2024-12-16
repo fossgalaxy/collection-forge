@@ -11,6 +11,9 @@
   ansible.builtin.include_tasks: postgres.yml
   when: woodpecker_server_db_manage
 
+- name: Include reverse-proxy related tasks
+  ansible.builtin.include_tasks: nginx.yml
+
 - name: Ensure service is running
   become: true
   ansible.builtin.service:

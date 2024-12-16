@@ -44,3 +44,9 @@ woodpecker_server_caddy_network: "caddy-ingress"
 woodpecker_server_caddy_labels:
   caddy: "{{ woodpecker_server_domain }}:{{ woodpecker_server_port }}"
   caddy.reverse_proxy: "{% raw %}{{ upstreams 8000 }}{% endraw %}"
+
+# reverse proxy: nginx
+woodpecker_server_nginx: true
+woodpecker_server_nginx_conf: "/etc/nginx/conf.d/30-woodpecker.conf"
+woodpecker_server_ssl_cert: "/etc/pki/tls/certs/{{ woodpecker_server_domain }}.pem"
+woodpecker_server_ssl_key: "/etc/pki/tls/private/{{ woodpecker_server_domain }}.pem"

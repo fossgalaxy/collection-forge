@@ -1,0 +1,34 @@
+server {
+	listen 443 ssl http2;
+	listen [::]:443 ssl http2;
+
+	server_name {{ fg_forgejo_domain }};
+
+	# ssl setup
+        ssl_certificate "{{ fg_forgejo_ssl_cert }}";
+        ssl_certificate_key "{{ fg_forgejo_ssl_key }}";
+        ssl_session_cache shared:SSL:1m;
+        ssl_session_timeout  10m;
+        ssl_ciphers PROFILE=SYSTEM;
+        ssl_prefer_server_ciphers on;
+
+	# Pretty error pages
+	error_page 502 503 /50x.html;
+	location = /50x.html {
+		root /usr/share/nginx/html;
+	}
+
+	# pass requests off to forgejo
+	location / {
+		proxy_pass http://localhost:{{ fg_forgejo_web_port }};
+
+		proxy_set_header Connection $http_connection;
+		proxy_set_header Upgrade $http_upgrade;
+		proxy_set_header Host $host;
+		proxy_set_header X-Real-IP $remote_addr;
+		proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+		proxy_set_header X-Forwarded-Proto $scheme;
+
+		client_max_body_size 512M;
+	}
+}
