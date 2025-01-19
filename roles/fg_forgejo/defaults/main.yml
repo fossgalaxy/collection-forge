@@ -2,7 +2,7 @@
 # defaults file for fg_forgejo
 
 # version infomation
-fg_forgejo_version: "9"
+fg_forgejo_version: "10"
 fg_forgejo_image: "codeberg.org/forgejo/forgejo:{{ fg_forgejo_version }}"
 
 # podman container integration
