@@ -23,12 +23,16 @@
     name: forgejo
     state: started
 
-- name: FreeIPA integration
-  ansible.builtin.include_tasks: freeipa.yml
-
 - name: Create admin user for ansible tasks
-  become: true
-  fossgalaxy.forge.forgejo_admin:
-    username: "{{ fg_forgejo_admin_username }}"
-    email: "{{ fg_forgejo_admin_email }}"
-    admin: true
+  when: fg_forgejo_token is undefined
+  block:
+    # create account for admin tasks
+     - fossgalaxy.forge.forgejo_admin:
+          auth_forgejo_url: "{{ fg_forgejo_domain }}"
+          username: "{{ fg_forgejo_admin_username }}"
+          email: "{{ fg_forgejo_admin_email }}"
+          admin: true
+
+- name: FreeIPA integration
+  when: fg_forgejo_ldap_host is defined
+  ansible.builtin.include_tasks: freeipa.yml

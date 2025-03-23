@@ -25,7 +25,8 @@ def get_token(module_params):
     base_url = module_params.get('auth_forgejo_url')
     
     if token is None:
-        pass
+        # TODO implement token-fetching support
+        return {}
 
     return {
             'Authorization': 'Bearer ' + token,
@@ -36,7 +37,7 @@ def get_token(module_params):
 class ForgejoError(Exception):
     pass
 
-class FrogejoAPI(object):
+class ForgejoAPI(object):
 
     def __init__(self, module, connection_headers):
         self.module = module
@@ -52,12 +53,9 @@ class FrogejoAPI(object):
             if e.code == 404:
                 return None
             else:
-                self.fail_open_url(e, msg="Could not get user '%s': %s" % (username, str(e)),
-                                   exception.traceback.format_exc())
+                self.fail_open_url(e, msg="Could not get user '%s': %s" % (username, str(e)))
         except Exception as e:
-            self.module.fail_json(msg="Could not get user '%s': %s" % (username, str(e)),
-                                   exception.traceback.format_exc())
-                                  )
+            self.module.fail_json(msg="Could not get user '%s': %s" % (username, str(e)))
 
     def fail_open_url(self, e, msg, **kwargs):
         try:

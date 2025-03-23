@@ -78,9 +78,11 @@ import requests
 def run_module():
     # define available arguments/parameters a user can pass to the module
     module_args = dict(
+        auth_forgejo_url=dict(type='str', aliases=['url'], required=True, no_log=False),
+        auth_forgejo_token=dict(type='str', aliases=['token'], required=True, no_log=True),
         username=dict(type='str', required=True),
         email=dict(type='str', required=True),
-        password=dict(type='str', required=False, default=None),
+        password=dict(type='str', required=False, default=None, no_log=True),
         admin=dict(type='bool', required=False, default=False)
     )
 
@@ -113,7 +115,6 @@ def run_module():
         # state with no modifications
         if module.check_mode:
             module.exit_json(**result)
-
 
         # we need to check if the user exists, exec throws an error if not.
         user_json = api.get_user_by_username( module.params['username'] )
