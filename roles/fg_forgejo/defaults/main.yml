@@ -20,6 +20,29 @@ fg_forgejo_db_name: "forgejo"
 fg_forgejo_db_user: "forgejo_app"
 #fg_forgejo_db_password: ""
 
+# freeipa integration
+fg_forgejo_ldap_host: "ipa.example.com"
+fg_forgejo_ldap_base: "dc=example,dc=com"
+fg_forgejo_ldap_dn: "uid=forgejo,cn=sysaccounts,cn=etc,{{ fg_forgejo_ldap_base }}"
+fg_forgjeo_ldap_uid: "forgejo"
+#fg_forgejo_ldap_pass: 
+
+fg_forgejo_ldap_user_base: "ou=Users,{{ fg_forgejo_ldap_base }}"
+fg_forgejo_ldap_group_base: "ou=group,{{ fg_forgejo_ldap_base }}"
+#fg_forgejo_ldap_group_map:
+#  "cn=my-group,...":
+#    "dummy_org":
+#      - team1
+#      - team2
+fg_forgejo_ldap_group_only: true
+
+##
+# admin integration
+##
+fg_forgejo_admin_username: "ansible"
+fg_forgejo_admin_email: "ansible@{{ fg_forgejo_domain }}"
+
+
 ##
 # Config Settings
 ##

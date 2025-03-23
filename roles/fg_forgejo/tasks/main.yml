@@ -22,3 +22,13 @@
   ansible.builtin.service:
     name: forgejo
     state: started
+
+- name: FreeIPA integration
+  ansible.builtin.include_tasks: freeipa.yml
+
+- name: Create admin user for ansible tasks
+  become: true
+  fossgalaxy.forge.forgejo_admin:
+    username: "{{ fg_forgejo_admin_username }}"
+    email: "{{ fg_forgejo_admin_email }}"
+    admin: true

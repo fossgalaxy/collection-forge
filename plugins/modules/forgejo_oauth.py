@@ -70,6 +70,7 @@ message:
 '''
 
 from ansible.module_utils.basic import AnsibleModule
+
 import requests
 
 class TokenAuth(requests.auth.AuthBase):

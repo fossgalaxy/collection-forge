@@ -1,0 +1,23 @@
+---
+
+# TODO
+#- name: Ensure LDAP bind account exists
+#  community.general.ldap_entry:
+#    dn: 
+#    objectClass:
+#      - account
+#      - simplesecurityobject
+#    attributes:
+#      uid: forgejo
+#      userPassword:
+#      passwordExpirationTime:
+
+
+- name: Ensure FreeIPA Provider exists
+  fossgalaxy.forge.forgejo_ldap:
+    hostname: "{{ fg_forgejo_ldap_host }}"
+    search_base: "{{ fg_forgejo_ldap_base }}"
+
+    # bind account
+    bind_dn: "{{ fg_forgejo_ldap_dn }}"
+    bind_password: "{{ fg_forgejo_ldap_pass }}"
