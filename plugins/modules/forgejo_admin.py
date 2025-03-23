@@ -71,6 +71,7 @@ message:
 
 from ansible.module_utils.basic import AnsibleModule
 import ansible_collections.fossgalaxy.forge.plugins.module_utils.forgejo.forgejo_podman as forgejo_common
+from ansible_collections.fossgalaxy.forge.plugins.module_utils.forgejo.forgejo_api import get_token, ForgejoAPI, ForgejoError
 
 import requests
 
@@ -103,16 +104,34 @@ def run_module():
         supports_check_mode=True
     )
 
-    # if the user is working with this module in only check mode we do not
-    # want to make any changes to the environment, just return the current
-    # state with no modifications
-    if module.check_mode:
-        module.exit_json(**result)
+    try:
+        connection_header = get_token(module.params)
+        api = ForgejoAPI(module, connection_header)
+
+        # if the user is working with this module in only check mode we do not
+        # want to make any changes to the environment, just return the current
+        # state with no modifications
+        if module.check_mode:
+            module.exit_json(**result)
 
 
-    # execute the command
-    result['account'] = forgejo_common.create_user(module, module.params['username'], module.params['email'], module.params['password'], module.params['admin'])
-    module.exit_json(**result)
+        # we need to check if the user exists, exec throws an error if not.
+        user_json = api.get_user_by_username( module.params['username'] )
+        if user_json is None:
+            result['changed'] = True
+            result['account'] = forgejo_common.create_user(module, 
+                                                           module.params['username'],
+                                                           module.params['email'],
+                                                           module.params['password'],
+                                                           module.params['admin'])
+            module.exit_json(**result)
+        else:
+            # TODO handle returning existing user
+            result['changed'] = False
+            module.exit_json(**result)
+
+    except ForgejoError as e:
+        module.fail_json(msg=str(e))
 
 
 def main():
