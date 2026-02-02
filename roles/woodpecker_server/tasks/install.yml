@@ -1,13 +1,13 @@
 ---
 
-- name: Create agent key secret
+- name: install | Create agent key secret
   become: true
   containers.podman.podman_secret:
     state: present
     name: woodpecker-agent-key
     data: "{{ woodpecker_server_agent_key }}"
 
-- name: Ensure configuration volume quadlet exists
+- name: install | Ensure configuration volume quadlet exists
   become: true
   containers.podman.podman_image:
     name: "{{ woodpecker_server_config_volume }}"
@@ -16,7 +16,7 @@
   notify:
     - Reload woodpecker service
 
-- name: Ensure container quadlet exists
+- name: install | Ensure container quadlet exists
   become: true
   containers.podman.podman_container:
     name: woodpecker_server

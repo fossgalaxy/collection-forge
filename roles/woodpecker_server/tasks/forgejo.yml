@@ -2,7 +2,7 @@
 # Forgejo integrations
 
 # Mode: manually set token
-- name: Create secret for oauth
+- name: forgejo | Create secret for oauth
   become: true
   when: woodpecker_server_forgejo_secret is defined
   containers.podman.podman_secret:

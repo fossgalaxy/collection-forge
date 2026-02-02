@@ -1,6 +1,6 @@
 ---
 
-- name: Create forgejo volume quadlet
+- name: install | Create forgejo volume quadlet
   become: true
   containers.podman.podman_volume:
     state: quadlet
@@ -10,7 +10,7 @@
     - Reload forgejo service
     - Restart forgejo
 
-- name: Ensure git volume exists
+- name: install | Ensure git volume exists
   become: true
   containers.podman.podman_volume:
     state: quadlet
@@ -20,7 +20,7 @@
     - Reload forgejo service
     - Restart forgejo
 
-- name: Ensure configuration folder exists
+- name: install | Ensure configuration folder exists
   become: true
   ansible.builtin.file:
     dest: "{{ item }}"
@@ -33,7 +33,7 @@
     - "{{ fg_forgejo_custom_dir }}"
     - "{{ fg_forgejo_custom_dir }}conf"
 
-- name: Provide customised forgejo config
+- name: install | Provide customised forgejo config
   become: true
   ansible.builtin.template:
     src: app.ini.j2
@@ -45,7 +45,7 @@
   notify:
     - Restart forgejo
 
-- name: Create forgejo network quadlet
+- name: install | Create forgejo network quadlet
   become: true
   containers.podman.podman_network:
     name: "forgejo"
@@ -55,7 +55,7 @@
     - Reload forgejo service
     - Restart forgejo
 
-- name: Create forgejo container quadlet
+- name: install | Create forgejo container quadlet
   become: true
   containers.podman.podman_container:
     name: forgejo

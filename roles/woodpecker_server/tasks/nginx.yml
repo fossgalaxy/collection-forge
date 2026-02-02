@@ -1,7 +1,7 @@
 ---
 # drop-in support for an nginx proxy
 
-- name: Ensure the vhost template exists
+- name: nginx | Ensure the vhost template exists
   become: true
   ansible.builtin.template:
     mode: '0600'
@@ -9,7 +9,7 @@
     dest: "{{ woodpecker_server_nginx_conf }}"
   when: "woodpecker_server_nginx"
 
-- name: Ensure the vhost does not exist
+- name: nginx | Ensure the vhost does not exist
   become: true
   ansible.builtin.template:
     path: "{{ woodpecker_server_nginx_conf }}"

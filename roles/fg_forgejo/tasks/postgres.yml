@@ -1,19 +1,19 @@
 ---
 
-- name: Ensure the postgresql library is available on the host
+- name: postgres | Ensure the postgresql library is available on the host
   become: true
   ansible.builtin.dnf:
     name: python3-psycopg2
     state: installed
 
-- name: Ensure the database exists
+- name: postgres | Ensure the database exists
   become: true
   become_user: postgres
   community.postgresql.postgresql_db:
     name: "{{ fg_forgejo_db_name }}"
     encoding: UTF-8
 
-- name: Ensure the database user exists
+- name: postgres | Ensure the database user exists
   become: true
   become_user: postgres
   community.postgresql.postgresql_user:

@@ -1,6 +1,6 @@
 ---
 
-- name: Ensure customisation folders exist
+- name: customise | Ensure customisation folders exist
   become: true
   ansible.builtin.file:
     dest: "{{ item }}"
@@ -23,7 +23,7 @@
     - "{{ fg_forgejo_custom_dir }}options/locales"
     - "{{ fg_forgejo_custom_dir }}options/readme"
 
-- name: Copy custom label sets
+- name: customise | Copy custom label sets
   become: true
   ansible.builtin.copy:
     src: "{{ item }}"
@@ -36,7 +36,7 @@
   notify:
     - Restart forgejo
 
-- name: Copy custom licences
+- name: customise | Copy custom licences
   become: true
   ansible.builtin.copy:
     src: "{{ item }}"
@@ -49,7 +49,7 @@
   notify:
     - Restart forgejo
 
-- name: Copy custom assets
+- name: customise | Copy custom assets
   become: true
   ansible.builtin.copy:
     src: "{{ item.value }}"
@@ -62,7 +62,7 @@
   notify:
     - Restart forgejo
 
-- name: Copy custom templates
+- name: customise | Copy custom templates
   become: true
   ansible.builtin.copy:
     src: "{{ item.value }}"
