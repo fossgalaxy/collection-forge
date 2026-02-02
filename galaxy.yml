@@ -37,8 +37,8 @@ tags: ['linux']
 # L(specifiers,https://python-semanticversion.readthedocs.io/en/latest/#requirement-specification). Multiple version
 # range specifiers can be set and are separated by ','
 dependencies: {
-  'community.postgresql': "3.9",
-  'containers.podman': "1.16.2"
+  'community.postgresql': ">3.9",
+  'containers.podman': ">1.16.2"
 }
 
 # The URL of the originating SCM repository

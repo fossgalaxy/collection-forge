@@ -1,5 +1,6 @@
 ---
-- hosts: localhost
+- name: Test that Forgejo can be installed
+  hosts: localhost
   remote_user: root
   roles:
-    - fossgalaxy.fg_forgejo
+    - fossgalaxy.forge.fg_forgejo
