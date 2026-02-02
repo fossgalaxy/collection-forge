@@ -16,7 +16,7 @@ readme: README.md
 # A list of the collection's content authors. Can be just the name or in the format 'Full Name <email> (url)
 # @nicks:irc/im.site#channel'
 authors:
-- Joseph Walton-Rivers <webpigeon@fossgalaxy.com>
+  - Joseph Walton-Rivers <webpigeon@fossgalaxy.com>
 
 
 ### OPTIONAL but strongly recommended
@@ -26,11 +26,11 @@ description: A collection of roles for building a forge service.
 # Either a single license or a list of licenses for content inside of a collection. Ansible Galaxy currently only
 # accepts L(SPDX,https://spdx.org/licenses/) licenses. This key is mutually exclusive with 'license_file'
 license:
-- MIT
+  - MIT
 
 # A list of tags you want to associate with the collection for indexing/searching. A tag name has the same character
 # requirements as 'namespace' and 'name'
-tags: []
+tags: ['linux']
 
 # Collections that this collection requires to be installed for it to be usable. The key of the dict is the
 # collection label 'namespace.name'. The value is a version range
@@ -65,4 +65,3 @@ build_ignore: []
 # 'omit_default_directives' is a boolean that controls whether the default directives are used. Mutually exclusive
 # with 'build_ignore'
 # manifest: null
-

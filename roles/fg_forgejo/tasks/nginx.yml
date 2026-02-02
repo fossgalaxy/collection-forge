@@ -4,6 +4,7 @@
 - name: Ensure the vhost template exists
   become: true
   ansible.builtin.template:
+    mode: '0600'
     src: vhost.j2
     dest: "{{ fg_forgejo_nginx_conf }}"
   when: "fg_forgejo_nginx"

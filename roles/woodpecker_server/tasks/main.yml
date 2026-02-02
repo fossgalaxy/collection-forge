@@ -1,7 +1,7 @@
 ---
 
 # needs to be done first so we can set the client id
-- name: forgejo integration
+- name: Setup forgejo integration
   ansible.builtin.include_tasks: forgejo.yml
 
 - name: Install woodpecker server
@@ -19,4 +19,3 @@
   ansible.builtin.service:
     name: woodpecker_server
     state: started
-

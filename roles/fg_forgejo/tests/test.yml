@@ -2,4 +2,4 @@
 - hosts: localhost
   remote_user: root
   roles:
-    - webpigeon.fg_forgejo
+    - fossgalaxy.fg_forgejo

@@ -26,7 +26,7 @@
       WOODPECKER_HOST: "{{ woodpecker_server_web_url }}"
       WOODPECKER_OPEN: "{{ woodpecker_server_allow_registration }}"
       WOODPECKER_ADMIN: "{{ woodpecker_server_admins | join(',') }}"
-      #WOODPECKER_ORGS: "{{ woodpecker_server_orgs | join(',') }}"
+      # WOODPECKER_ORGS: "{{ woodpecker_server_orgs | join(',') }}"
       WOODPECKER_FORGEJO: true
       WOODPECKER_FORGEJO_URL: "{{ woodpecker_server_forgejo_url }}"
       WOODPECKER_FORGEJO_CLIENT: "{{ woodpecker_server_forgejo_client }}"

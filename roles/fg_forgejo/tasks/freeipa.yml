@@ -1,9 +1,9 @@
 ---
 
 # TODO
-#- name: Ensure LDAP bind account exists
+# - name: Ensure LDAP bind account exists
 #  community.general.ldap_entry:
-#    dn: 
+#    dn:
 #    objectClass:
 #      - account
 #      - simplesecurityobject
