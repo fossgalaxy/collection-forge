@@ -1,5 +1,8 @@
 
 
+test:
+    molecule test --all
+
 lint:
     ansible-lint
 

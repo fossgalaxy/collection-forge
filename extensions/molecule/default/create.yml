@@ -1,0 +1,22 @@
+---
+- name: Initialize all resources
+  hosts: localhost
+  gather_facts: false
+  tasks:
+    - name: Initializing resource
+      ansible.builtin.copy:
+        mode: '0600'
+        dest: "{{ tmp_dir }}{{ item }}_created.yml"
+        content: |
+          {{ hostvars[item].attributes }}
+      loop: "{{ groups['test_resources'] }}"
+
+- name: Ensure resource creation
+  hosts: test_resources
+  gather_facts: false
+  tasks:
+    - name: Resource initialized
+      ansible.builtin.stat:
+        path: "{{ tmp_dir }}{{ inventory_hostname }}_created.yml"
+      register: result
+      failed_when: not result.stat.exists

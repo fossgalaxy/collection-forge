@@ -1,0 +1,9 @@
+---
+- hosts: localhost
+  gather_facts: false
+  tasks:
+    - name: Destroy the resources
+      ansible.builtin.file:
+        path: "{{ tmp_dir }}{{ item }}_created.yml"
+        state: absent
+      loop: "{{ groups['test_resources'] }}"

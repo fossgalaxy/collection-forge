@@ -1,0 +1,17 @@
+---
+ansible:
+  executor:
+    args:
+      ansible_playbook:
+        - --inventory=${MOLECULE_SCENARIO_DIRECTORY}/../inventory.yml
+
+scenario:
+  test_sequence:
+    - prepare
+    - converge
+    - verify
+    - idempotence
+    - verify
+    - cleanup
+
+shared_state: true

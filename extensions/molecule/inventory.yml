@@ -1,0 +1,9 @@
+---
+all:
+  vars:
+    tmp_dir: "{{ lookup('env', 'TMPDIR') | default('/tmp') }}"
+  children:
+    test_resources:
+      hosts: {}
+      vars:
+        ansible_connection: local
