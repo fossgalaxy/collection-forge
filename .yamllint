@@ -1,0 +1,30 @@
+---
+extends: default
+
+rules:
+  # Required by ansible-lint
+  comments:
+    min-spaces-from-content: 1
+  comments-indentation: false
+  braces:
+    max-spaces-inside: 1
+  octal-values:
+    forbid-implicit-octal: true
+    forbid-explicit-octal: true
+
+  # Recommended for Ansible repos
+  line-length:
+    max: 140
+    level: warning
+    allow-non-breakable-words: true
+    allow-non-breakable-inline-mappings: true
+
+  # Avoid EOF/newline fights
+  empty-lines:
+    max: 1
+    max-start: 0
+    max-end: 0
+
+  # Optional: Ansible commonly uses quoted booleans in labels, etc.
+  truthy:
+    check-keys: false
