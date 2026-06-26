@@ -1,15 +1,15 @@
 ---
-# handlers file for fg_forgejo
+# handlers file for forgejo
 
-- name: "Restart forgejo"
+- name: "Restart Forgejo"
   become: true
   ansible.builtin.service:
-    name: forgejo
+    name: "{{ forgejo_service }}"
     state: restarted
 
-- name: "Reload forgejo service"
+- name: "Reload Forgejo"
   become: true
   ansible.builtin.systemd_service:
     daemon_reload: true
-    name: forgejo
+    name: "{{ forgejo_service }}"
     state: restarted

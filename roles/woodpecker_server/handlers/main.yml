@@ -1,5 +1,5 @@
 ---
-# handlers file for fg_forgejo
+# handlers file for forgejo
 
 - name: "Restart woodpecker"
   become: true

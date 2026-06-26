@@ -1,0 +1,77 @@
+---
+# Customisation hooks
+
+- name: customise | Ensure customisation folders exist
+  become: true
+  ansible.builtin.file:
+    dest: "{{ item }}"
+    state: directory
+    owner: "{{ forgejo_uid }}"
+    group: "{{ forgejo_gid }}"
+    mode: "0550"
+    setype: "{{ forgejo_custom_setype }}"
+  with_items:
+    - "{{ forgejo_custom_dir }}/templates"
+    - "{{ forgejo_custom_dir }}/templates/custom"
+    - "{{ forgejo_custom_dir }}/templates/mail"
+    - "{{ forgejo_custom_dir }}/public"
+    - "{{ forgejo_custom_dir }}/public/assets"
+    - "{{ forgejo_custom_dir }}/public/assets/img"
+    - "{{ forgejo_custom_dir }}/options"
+    - "{{ forgejo_custom_dir }}/options/gitignore"
+    - "{{ forgejo_custom_dir }}/options/label"
+    - "{{ forgejo_custom_dir }}/options/licence"
+    - "{{ forgejo_custom_dir }}/options/locales"
+    - "{{ forgejo_custom_dir }}/options/readme"
+
+- name: customise | Copy custom label sets
+  become: true
+  ansible.builtin.copy:
+    src: "{{ item }}"
+    dest: "{{ forgejo_custom_dir }}/options/label/{{ item | basename }}"
+    owner: "{{ forgejo_uid }}"
+    group: "{{ forgejo_gid }}"
+    mode: "0400"
+    setype: "{{ forgejo_custom_setype }}"
+  with_items: "{{ forgejo_custom_labels }}"
+  notify:
+    - Restart Forgejo
+
+- name: customise | Copy custom licences
+  become: true
+  ansible.builtin.copy:
+    src: "{{ item }}"
+    dest: "{{ forgejo_custom_dir }}/options/licences/{{ item | basename }}"
+    owner: "{{ forgejo_uid }}"
+    group: "{{ forgejo_gid }}"
+    mode: "0400"
+    setype: "{{ forgejo_custom_setype }}"
+  with_items: "{{ forgejo_custom_licences }}"
+  notify:
+    - Restart Forgejo
+
+- name: customise | Copy custom assets
+  become: true
+  ansible.builtin.copy:
+    src: "{{ item.value }}"
+    dest: "{{ forgejo_custom_dir }}/public/assets/{{ item.key }}"
+    owner: "{{ forgejo_uid }}"
+    group: "{{ forgejo_gid }}"
+    mode: "0400"
+    setype: "{{ forgejo_custom_setype }}"
+  loop: "{{ forgejo_custom_assets | dict2items }}"
+  notify:
+    - Restart Forgejo
+
+- name: customise | Copy custom templates
+  become: true
+  ansible.builtin.copy:
+    src: "{{ item.value }}"
+    dest: "{{ forgejo_custom_dir }}/templates/{{ item.key }}"
+    owner: "{{ forgejo_uid }}"
+    group: "{{ forgejo_gid }}"
+    mode: "0400"
+    setype: "{{ forgejo_custom_setype }}"
+  loop: "{{ forgejo_custom_templates | dict2items }}"
+  notify:
+    - Restart Forgejo

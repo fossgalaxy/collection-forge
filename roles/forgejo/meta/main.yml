@@ -3,8 +3,8 @@ galaxy_info:
   description: A role for deploying Forgejo in Podman
   company: FOSS Galaxy
 
-  role_name: fg_forgejo
-  namespace: webpigeon
+  role_name: forgejo
+  namespace: fossgalaxy
 
   license: MIT
 

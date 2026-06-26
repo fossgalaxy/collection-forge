@@ -1,0 +1,35 @@
+---
+
+- name: Validate db vars
+  ansible.builtin.assert:
+    that:
+      - forgejo_db_host is string and forgejo_db_host | length > 0
+      - forgejo_db_name is string and forgejo_db_name | length > 0
+      - forgejo_db_owner is string and forgejo_db_owner | length > 0
+      - forgejo_db_user is string and forgejo_db_user | length > 0
+      - forgejo_db_pw is string and forgejo_db_pw | length > 0
+
+- name: Ensure Forgejo DB exists
+  no_log: true
+  ansible.builtin.include_role:
+    name: "fossgalaxy.infra.postgres_db"
+    tasks_from: "ensure_db.yml"
+  vars:
+    pg_host: "{{ forgejo_db_host }}"
+    pg_db: "{{ forgejo_db_name }}"
+    pg_owner: "{{ forgejo_db_owner }}"
+    pg_app_user: "{{ forgejo_db_user }}"
+    pg_app_password: "{{ forgejo_db_pw }}"
+    pg_app_inherits_owner: true
+    pg_remote: "{{ forgejo_db_remote }}"
+  when: forgejo_db | bool
+
+- name: Ensure secret for database password exists
+  become: true
+  no_log: true
+  containers.podman.podman_secret:
+    state: present
+    name: "{{ forgejo_secret_db_password }}"
+    data: "{{ forgejo_db_pw }}"
+  notify:
+    - Restart Forgejo

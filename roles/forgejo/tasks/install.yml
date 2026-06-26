@@ -1,25 +1,5 @@
 ---
 
-- name: install | Create forgejo volume quadlet
-  become: true
-  containers.podman.podman_volume:
-    state: quadlet
-    name: forgejo-data
-    quadlet_dir: "{{ fg_forgejo_service_dir }}"
-  notify:
-    - Reload forgejo service
-    - Restart forgejo
-
-- name: install | Ensure git volume exists
-  become: true
-  containers.podman.podman_volume:
-    state: quadlet
-    name: forgejo-git
-    quadlet_dir: "{{ fg_forgejo_service_dir }}"
-  notify:
-    - Reload forgejo service
-    - Restart forgejo
-
 - name: install | Ensure configuration folder exists
   become: true
   ansible.builtin.file:

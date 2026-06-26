@@ -1,0 +1,84 @@
+---
+
+- name: Ensure podman database is setup
+  ansible.builtin.include_tasks: "podman_postgres.yml"
+  when: forgejo_db | bool
+
+- name: Ensure data volume exists
+  become: true
+  containers.podman.podman_volume:
+    state: quadlet
+    name: "{{ forgejo_volume_data }}"
+  notify:
+    - Reload Forgejo
+
+- name: Ensure git volume exists
+  become: true
+  containers.podman.podman_volume:
+    state: quadlet
+    name: "{{ forgejo_volume_git }}"
+  notify:
+    - Reload Forgejo
+
+- name: Validate secret vars
+  ansible.builtin.assert:
+    that:
+      - forgejo_secretkey is string and forgejo_secretkey | length > 0
+      - forgejo_internal_token is string and forgejo_internal_token | length > 0
+      - forgejo_jwt_oauth is string and forgejo_jwt_oauth | length > 0
+      - forgejo_jwt_lfs is string and forgejo_jwt_lfs | length > 0
+  changed_when: false
+
+- name: Ensure secret for secret key exists
+  become: true
+  no_log: true
+  containers.podman.podman_secret:
+    state: present
+    name: "{{ forgejo_secret_secretkey }}"
+    data: "{{ forgejo_secretkey }}"
+  notify:
+    - Reload Forgejo
+
+- name: Ensure secret for internal token exists
+  become: true
+  no_log: true
+  containers.podman.podman_secret:
+    state: present
+    name: "{{ forgejo_secret_internal_token }}"
+    data: "{{ forgejo_internal_token }}"
+  notify:
+    - Reload Forgejo
+
+- name: Ensure secret for JWT oauth exists
+  become: true
+  no_log: true
+  containers.podman.podman_secret:
+    state: present
+    name: "{{ forgejo_secret_jwt_oauth }}"
+    data: "{{ forgejo_jwt_oauth }}"
+  notify:
+    - Reload Forgejo
+
+- name: Ensure secret for JWT lfs exists
+  become: true
+  no_log: true
+  containers.podman.podman_secret:
+    state: present
+    name: "{{ forgejo_secret_jwt_lfs }}"
+    data: "{{ forgejo_jwt_lfs }}"
+  notify:
+    - Reload Forgejo
+
+- name: Ensure container exists
+  become: true
+  containers.podman.podman_container:
+    name: "{{ forgejo_service }}"
+    image: "{{ forgejo_image }}"
+    state: quadlet
+    env: "{{ forgejo_env | combine(forgejo_extra_env) }}"
+    secrets: "{{ forgejo_secrets + forgejo_extra_secrets }}"
+    volumes: "{{ forgejo_volumes + forgejo_extra_volumes }}"
+    label: "{{ forgejo_labels | combine(forgejo_extra_labels ) }}"
+    quadlet_options: "{{ forgejo_quadlet_options + forgejo_extra_quadlet_options }}"
+  notify:
+    - Reload Forgejo

@@ -1,0 +1,44 @@
+---
+# vars file for forgejo
+
+forgejo_env: >-
+  {{
+    {
+      'USER_UID': forgejo_uid,
+      'USER_GID': forgejo_gid,
+      'FORGEJO_CUSTOM': '/data/custom'
+    }
+  }}
+
+forgejo_secrets: >-
+  {{
+    ((forgejo_db | bool) | ternary(
+      [ forgejo_secret_db_password ~ ',uid=' ~ forgejo_uid ], []
+    ))
+    + [
+      forgejo_secret_secretkey ~ ',uid=' ~ forgejo_uid,
+      forgejo_secret_internal_token ~ ',uid=' ~ forgejo_uid,
+      forgejo_secret_jwt_oauth ~ ',uid=' ~ forgejo_uid,
+      forgejo_secret_jwt_lfs ~ ',uid=' ~ forgejo_uid
+    ]
+  }}
+
+forgejo_volumes: >-
+  {{
+    [
+      forgejo_custom_dir ~ ":/data/custom:Z",
+      forgejo_volume_git ~ ".volume:" ~ forgejo_dir_git ~ ":Z",
+      forgejo_volume_data ~ ".volume:" ~ forgejo_dir_root ~ ":Z"
+    ]
+  }}
+
+forgejo_labels: >-
+  {{
+    (forgejo_traefik | bool)
+    | ternary(forgejo_traefik_labels, {})
+  }}
+
+forgejo_quadlet_options:
+  - |
+    [Install]
+    WantedBy={{ forgejo_quadlet_wanted_by }}

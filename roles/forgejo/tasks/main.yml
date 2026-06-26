@@ -1,0 +1,36 @@
+---
+# tasks file for forgejo
+
+- name: Validate container engine
+  ansible.builtin.assert:
+    that:
+      - forgejo_container_engine in ['podman']
+    fail_msg: "unsupported container engine: {{ forgejo_container_engine }}"
+  changed_when: false
+
+- name: Include configurations
+  ansible.builtin.include_tasks: podman_configure.yml
+
+- name: Include container engine tasks
+  ansible.builtin.include_tasks: "engine_{{ forgejo_container_engine }}.yml"
+
+- name: Include customisations
+  ansible.builtin.include_tasks: podman_customise.yml
+
+- name: Ensure service is running
+  become: true
+  ansible.builtin.service:
+    name: forgejo
+    state: started
+
+#- name: Create admin user for ansible tasks
+#  when: forgejo_token is undefined
+#  block:
+#    # create account for admin tasks
+#    - name: Ensure admin account exists
+#      fossgalaxy.forge.forgejo_admin:
+#        auth_forgejo_url: "{{ forgejo_domain }}"
+#        username: "{{ forgejo_admin_user }}"
+#        email: "{{ forgejo_admin_email }}"
+#        admin: true
+

@@ -1,0 +1,27 @@
+---
+# Configuration
+
+- name: install | Ensure configuration folder exists
+  become: true
+  ansible.builtin.file:
+    dest: "{{ item }}"
+    state: directory
+    owner: "{{ forgejo_uid }}"
+    group: "{{ forgejo_gid }}"
+    mode: "0500"
+    setype: "{{ forgejo_custom_setype }}"
+  with_items:
+    - "{{ forgejo_custom_dir }}"
+    - "{{ forgejo_custom_dir }}/conf"
+
+- name: install | Provide customised forgejo config
+  become: true
+  ansible.builtin.template:
+    src: app.ini.j2
+    dest: "{{ forgejo_custom_dir }}/conf/app.ini"
+    owner: "{{ forgejo_uid }}"
+    group: "{{ forgejo_gid }}"
+    mode: "0400"
+    setype: "{{ forgejo_custom_setype }}"
+  notify:
+    - Restart Forgejo
