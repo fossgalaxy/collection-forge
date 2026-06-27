@@ -46,12 +46,30 @@ ISSUE_INDEXER_PATH = /data/gitea/indexers/issues.bleve
 PROVIDER_CONFIG = /data/gitea/sessions
 PROVIDER = file
 
-[picture]
-AVATAR_UPLOAD_PATH = {{ forgejo_dir_avatars_user }}
-REPOSITORY_AVATAR_UPLOAD_PATH = {{ forgejo_dir_avatars_repo }}
-
+# Storage Paths
 [attachment]
 PATH = {{ forgejo_dir_attachments }}
+
+[avatar]
+PATH = {{ forgejo_dir_avatars_user }}
+
+[repo-avatar]
+PATH = {{ forgejo_dir_avatars_repo }}
+
+[repo-archive]
+PATH = {{ forgejo_dir_repo_archive }}
+
+[packages]
+PATH = {{ forgejo_dir_packages }}
+
+[storage.actions_log]
+PATH = {{ forgejo_dir_actions_log }}
+
+[actions.artifacts]
+PATH = {{ forgejo_dir_actions_artefacts }}
+
+[lfs]
+PATH = {{ forgejo_dir_git_lfs }}
 
 [log]
 MODE = console
@@ -78,9 +96,6 @@ DEFAULT_ALLOW_CREATE_ORGANIZATION = true
 DEFAULT_ENABLE_TIMETRACKING = true
 NO_REPLY_ADDRESS = {{ forgejo_domain_noreply }}
 
-[lfs]
-PATH = {{ forgejo_dir_git_lfs }}
-
 [repository]
 ROOT = {{ forgejo_dir_git_repos }}
 {% if forgejo_licences_preferred %}
@@ -105,3 +120,7 @@ DEFAULT_TRUST_MODEL = committer
 
 [oauth2]
 JWT_SECRET_URI = file:/run/secrets/{{ forgejo_secret_jwt_oauth }}
+
+[other]
+SHOW_FOOTER_VERSION = false
+SHOW_FOOTER_TEMPLATE_LOAD_TIME = false

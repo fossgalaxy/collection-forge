@@ -105,7 +105,7 @@ forgejo_traefik_labels: >-
 forgejo_dir_root: /data/gitea
 forgejo_dir_git: /data/git
 
-forgejo_dir_attachments: "{{ forgejo_dir_root }]/attachments"
+forgejo_dir_attachments: "{{ forgejo_dir_root }}/attachments"
 forgejo_dir_avatars_user: "{{ forgejo_dir_root }}/avatars"
 forgejo_dir_avatars_repo: "{{ forgejo_dir_root }}/repo-avatars"
 forgejo_dir_repo_archive: "{{ forgejo_dir_root }}/repo-archive"
