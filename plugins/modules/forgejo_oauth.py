@@ -103,7 +103,7 @@ def get_oauth_provider(forgejo_host, token, name=None):
         return r.json(), None
 
 def get_oauth_provider_id(forgejo_host, token, provider_id):
-    """Get the an oauth provider directly."""
+    """Get the oauth provider directly."""
 
     r = requests.get( "{}api/v1/user/applications/oauth2/{}".format( forgejo_host, provider_id ), auth=token )
     if r.status_code != 200:

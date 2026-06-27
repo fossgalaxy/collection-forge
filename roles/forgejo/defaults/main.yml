@@ -8,51 +8,33 @@ forgejo_image: "codeberg.org/forgejo/forgejo:{{ forgejo_version }}"
 forgejo_domain: ""
 forgejo_url: "https://{{ forgejo_domain }}"
 
-# container options
-forgejo_container_engine: podman
-forgejo_service: forgejo
-forgejo_quadlet_wanted_by: multi-user.target
-
-forgejo_volume_data: "{{ forgejo_service }}_data"
-forgejo_volume_git: "{{ forgejo_service }}_git"
-
-# podman container integration
-forgejo_custom_dir: "/srv/podman/{{ forgejo_service }}"
-forgejo_custom_setype: container_file_t
-
-# podman secrets
-forgejo_secret_secretkey: "{{ forgejo_service }}_secretkey"
-forgejo_secret_internal_token: "{{ forgejo_service }}_internal_token"
-forgejo_secret_jwt_oauth: "{{ forgejo_service }}_jwt_oauth"
-forgejo_secret_jwt_lfs: "{{ forgejo_service }}_jwt_lfs"
-forgejo_secret_db_password: "{{ forgejo_service }}_db_pass"
-
+# values for the secrets forgejo needs
 forgejo_secretkey: ""
 forgejo_internal_token: ""
 forgejo_jwt_oauth: ""
 forgejo_jwt_lfs: ""
 
-# user ids
-forgejo_uid: 1000
-forgejo_gid: 1000
-
+##
 # database settings (only postgres is supported)
+##
 forgejo_db: true
 forgejo_db_host: "host.containers.internal"
 forgejo_db_name: "{{ forgejo_service }}"
 forgejo_db_owner: "{{ forgejo_service }}_admin"
 forgejo_db_user: "{{ forgejo_service}}_app"
 forgejo_db_pw: ""
-forgejo_db_remote: true
+forgejo_db_remote: "{{ ( forgejo_db_host != 'localhost' ) }}"
 
 ##
-# admin integration
+# admin account (bootstrapping)
 ##
+forgejo_admin_create: true
 forgejo_admin_user: "ansible"
 forgejo_admin_email: "ansible@{{ forgejo_domain }}"
+forgejo_admin_pw: ""
 
 ##
-# Config Settings
+# Forgejo Customisation
 ##
 
 # Branding
@@ -60,22 +42,59 @@ forgejo_name: forgejo
 forgejo_slogan: "Beyond coding. We Forge."
 forgejo_domain_noreply: "noreply.{{ forgejo_domain }}"
 
-# port bindings
-forgejo_web_port: 3000 # bind (host) port
+# feature switches
+forgejo_private_instance: true
+forgejo_privacy: true
 
-# should we bind to localhost?
-forgejo_expose_web_port: false
-forgejo_web_port_map: "{% if not forgejo_expose_web_port %}127.0.0.1:{% endif %}{{ forgejo_expose_web_port }}"
-
-forgejo_ssh_port: 222 # bind (host) port
-forgejo_ssh_domain: "{{ forgejo_domain }}"
-
-# Customisation Points
+# Defaults
 forgejo_licences_preferred: []
+forgejo_private_email: "{{ forgejo_privacy }}"
+
+# fine-grained controls
+forgejo_register_force_external: "{{ forgejo_private_instance and forgejo_oid }}"
+forgejo_register_allow: "{{ not forgejo_private_instance or forgejo_register_force_external }}"
+
+forgejo_register_email: "{{ forgejo_register_allow }}"
+
+forgejo_signin_openid: false
+forgejo_register_openid: "{{ forgejo_signin_openid | bool }}"
+
+forgejo_require_signin: false
+forgejo_allow_orgs: false
+
+# Customisation hooks
 forgejo_custom_licences: []
 forgejo_custom_labels: []
 forgejo_custom_assets: {}
 forgejo_custom_templates: {}
+
+##
+# container options
+##
+
+# engine selection
+forgejo_container_engine: podman
+forgejo_service: forgejo
+forgejo_quadlet_wanted_by: multi-user.target
+
+# volume names
+forgejo_volume_data: "{{ forgejo_service }}_data"
+forgejo_volume_git: "{{ forgejo_service }}_git"
+
+# secret names
+forgejo_secret_secretkey: "{{ forgejo_service }}_secretkey"
+forgejo_secret_internal_token: "{{ forgejo_service }}_internal_token"
+forgejo_secret_jwt_oauth: "{{ forgejo_service }}_jwt_oauth"
+forgejo_secret_jwt_lfs: "{{ forgejo_service }}_jwt_lfs"
+forgejo_secret_db_password: "{{ forgejo_service }}_db_pass"
+
+# customisation directory
+forgejo_custom_dir: "/srv/podman/{{ forgejo_service }}"
+forgejo_setype: container_file_t
+
+# user ids
+forgejo_uid: 1000
+forgejo_gid: 1000
 
 # reverse proxy: traefik
 forgejo_traefik: true
@@ -101,6 +120,17 @@ forgejo_traefik_labels: >-
       )
   }}
 
+# port bindings
+forgejo_web_port: 3000 # bind (host) port
+
+# should we bind to localhost?
+forgejo_expose_web_port: false
+forgejo_web_port_map: "{% if not forgejo_expose_web_port %}127.0.0.1:{% endif %}{{ forgejo_expose_web_port }}"
+
+forgejo_ssh_port: 2222 # bind (host) port
+forgejo_ssh_domain: "{{ forgejo_domain }}"
+
+
 # where should forgejo look for data?
 forgejo_dir_root: /data/gitea
 forgejo_dir_git: /data/git
@@ -115,6 +145,22 @@ forgejo_dir_actions_artefacts: "{{ forgejo_dir_root }}/actions_artifacts"
 
 forgejo_dir_git_repos: "{{ forgejo_dir_git }}/repos"
 forgejo_dir_git_lfs: "{{ forgejo_dir_git }}/lfs"
+
+# Integration: OpenID
+forgejo_oid_meta_url: ""
+forgejo_oid: "{{ forgejo_oid_meta_url | length > 0 }}"
+forgejo_oid_client: "{{ forgejo_service }}"
+
+forgejo_keycloak: "{{ forgejo_oid }}" # should we use the self-hosted role to configure keycloak?
+forgejo_keycloak_realm: "freeipa"
+
+forgejo_oid_provider_name: "freeipa"
+
+# FreeIPA trust
+forgejo_inject_cert: false
+forgejo_host_cert_location: /etc/ipa/ca.crt
+forgejo_tls_cert_dir: /usr/local/share/ca-certificates
+forgejo_app_cert_location: "{{ forgejo_tls_cert_dir }}/freeipa.crt"
 
 # Extra environment hook
 forgejo_extra_env: {}

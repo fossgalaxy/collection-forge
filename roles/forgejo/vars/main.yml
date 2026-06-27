@@ -6,7 +6,8 @@ forgejo_env: >-
     {
       'USER_UID': forgejo_uid,
       'USER_GID': forgejo_gid,
-      'FORGEJO_CUSTOM': '/data/custom'
+      'FORGEJO_CUSTOM': '/data/custom',
+      'SSL_CERT_DIR': forgejo_tls_cert_dir ~ ':/etc/ssl/certs:/etc/pki/tls/certs'
     }
   }}
 
@@ -25,7 +26,10 @@ forgejo_secrets: >-
 
 forgejo_volumes: >-
   {{
-    [
+    ((forgejo_inject_cert | bool) | ternary(
+      [ forgejo_host_cert_location ~ ':' ~ forgejo_app_cert_location ~ ":ro" ], []
+    ))
+    + [
       forgejo_custom_dir ~ ":/data/custom:Z",
       forgejo_volume_git ~ ".volume:" ~ forgejo_dir_git ~ ":Z",
       forgejo_volume_data ~ ".volume:" ~ forgejo_dir_root ~ ":Z"

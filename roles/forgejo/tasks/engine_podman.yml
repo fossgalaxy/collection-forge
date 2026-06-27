@@ -4,6 +4,9 @@
   ansible.builtin.include_tasks: "podman_postgres.yml"
   when: forgejo_db | bool
 
+- name: Include configurations
+  ansible.builtin.include_tasks: podman_configure.yml
+
 - name: Ensure data volume exists
   become: true
   containers.podman.podman_volume:
@@ -69,6 +72,9 @@
   notify:
     - Reload Forgejo
 
+- name: Include customisations
+  ansible.builtin.include_tasks: podman_customise.yml
+
 - name: Ensure container exists
   become: true
   containers.podman.podman_container:
@@ -82,3 +88,11 @@
     quadlet_options: "{{ forgejo_quadlet_options + forgejo_extra_quadlet_options }}"
   notify:
     - Reload Forgejo
+
+- name: Include bootstrap tasks
+  ansible.builtin.include_tasks: podman_bootstrap.yml
+  when: forgejo_admin_create
+
+- name: Include OpenID tasks
+  ansible.builtin.include_tasks: podman_openid.yml
+  when: forgejo_oid

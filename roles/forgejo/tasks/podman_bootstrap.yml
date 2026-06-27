@@ -1,0 +1,16 @@
+---
+
+- name: Validate admin vars
+  ansible.builtin.assert:
+    that:
+      - forgejo_admin_user is string and forgejo_admin_user | length > 0
+      - forgejo_admin_email is string and forgejo_admin_email | length > 0
+      - forgejo_admin_pw is string and forgejo_admin_pw | length > 0
+
+- name: Ensure admin account exists
+  become: true
+  fossgalaxy.forge.forgejo_bootstrap_admin:
+    username: "{{ forgejo_admin_user }}"
+    email: "{{ forgejo_admin_email }}"
+    password: "{{ forgejo_admin_pw }}"
+    admin: true

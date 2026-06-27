@@ -1,0 +1,51 @@
+---
+
+- name: Validate OIDC base vars
+  ansible.builtin.assert:
+    that:
+      - forgejo_oid_client is string and forgejo_oid_client | length > 0
+      - forgejo_oid_client is match("^[a-zA-Z0-9._-]+$")
+    fail_msg: "OIDC enabled but client ID is missing/empty."
+  changed_when: false
+
+- name: Validate OIDC vars (external provider)
+  ansible.builtin.assert:
+    that:
+      - forgejo_oid_meta_url is string and forgejo_oid_meta_url | length > 0
+      - forgejo_oid_secret is string and forgejo_oid_secret | length > 0
+    fail_msg: "External OIDC selected but required variables are missing/empty."
+  when: not forgejo_keycloak | bool
+  changed_when: false
+
+- name: Ensure forgejo client exists
+  no_log: true
+  ansible.builtin.include_role:
+    name: "fossgalaxy.selfhosted.keycloak_client"
+    tasks_from: ensure_client.yml
+  vars:
+    kc_client_id: "{{ forgejo_oid_client }}"
+    kc_client_name: "{{ forgejo_name }}"
+    kc_realm: "{{ forgejo_keycloak_realm }}"
+    kc_root_url: "{{ forgejo_url }}"
+    kc_redirect_uris:
+      - "{{ forgejo_url }}/user/oauth2/{{ forgejo_oid_provider_name }}/callback"
+    kc_output_var: forgejo_oid_details
+  when: forgejo_keycloak | bool
+
+- name: Set effective OIDC secret
+  ansible.builtin.set_fact:
+    forgejo_effective_oid_secret: >-
+      {{
+        (forgejo_oid_details.client_secret
+          if forgejo_keycloak | bool
+          else forgejo_oid_secret)
+      }}
+  no_log: true
+
+- name: Register keycloak provider
+  become: true
+  fossgalaxy.forge.forgejo_bootstrap_keycloak:
+    discover_url: "{{ forgejo_oid_meta_url }}"
+    client_id: "{{ forgejo_oid_client }}"
+    client_secret: "{{ forgejo_effective_oid_secret }}"
+    provider_name: "{{ forgejo_oid_provider_name }}"

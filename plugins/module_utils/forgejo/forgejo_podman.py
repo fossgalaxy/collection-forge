@@ -8,14 +8,17 @@ from __future__ import absolute_import, division, print_function
 __metaclass__ = type
 
 FORGEJO_EXE_PATH = "/app/gitea/forgejo-cli"
-TOKEN_TYPES = set(["INTERNAL_TOKEN", "JWT_SECRET", "LFS_JWT_SECRET", "SECRET_KEY"])
+TOKEN_TYPES = {"INTERNAL_TOKEN", "JWT_SECRET", "LFS_JWT_SECRET", "SECRET_KEY"}
 
 #"podman exec --user 1000 -it forgejo /app/gitea/forgejo-cli help"
 
 import re
 
-def run_forgejo_cli(module, args=[], executable='podman', container="forgejo", user_id=1000, expected_rc=0, ignore_errors=False):
+def run_forgejo_cli(module, args=None, executable='podman', container="forgejo", user_id=1000, expected_rc=0, ignore_errors=False):
     """Execute a command using the forgejo CLI"""
+
+    if args is None:
+        args = []
 
     command = [ executable,
                 "exec",
@@ -25,8 +28,7 @@ def run_forgejo_cli(module, args=[], executable='podman', container="forgejo", u
                ]
 
     # command arguments
-    if args is not None:
-        command.extend(args)
+    command.extend(args)
 
     # execute commands
     rc, out, err = module.run_command(command)
@@ -94,14 +96,39 @@ def create_ldap(module, hostname, search_base,
     rc, out, err = run_forgejo_cli(module, args=["admin", "auth", "add-ldap"] + args)
     return {}
 
+def create_keycloak(module, auto_discover_url, client_id, client_secret,
+                *,
+                name="freeipa",
+                skip_2fa=True
+                ):
+    """Create Keycloak connection."""
+
+    args = [
+        "--name", name,
+        "--provider", "openidConnect",
+        "--key", client_id,
+        "--secret", client_secret,
+        "--auto-discover-url", auto_discover_url
+    ]
+
+    if skip_2fa:
+        args.append("--skip-local-2fa")
+
+    rc, out, err = run_forgejo_cli(module, args=["admin", "auth", "add-oauth"] + args)
+    return {}
 
 def get_auth_sources(module): 
     rc, out, err = run_forgejo_cli(module, args=["admin", "auth", "list"])
 
+    # remove header row
+    lines = out.split("\n")[1:]
+
     sources = []
-    for line in out.split("\n"):
+    for line in lines:
         parts = line.split("\t")
-        sources.append(parts)
+        if len(parts) < 2:
+            continue
+        sources.append(parts[1])
 
     return sources
 
@@ -123,17 +150,18 @@ def create_user(module, username, email, password=None, admin=True):
     if admin:
         args.append("--admin")
 
-    rc, out, err = run_forgejo_cli(module, args=["admin", "user", "create"] + args)
+    rc, out, err = run_forgejo_cli(module, args=["admin", "user", "create"] + args, ignore_errors=True)
     
     # return code 1 = error
     if rc == 1:
-        if out.contains('Command error: CreateUser: user already exists'):
+        if 'Command error: CreateUser: user already exists' in out or \
+           'Command error: CreateUser: user already exists' in err:
             return {
                     'username': username,
                     'email': email,
                     'password': None,
                     'admin': admin,
-                    'changed': True
+                    'changed': False
             }
         return None
 

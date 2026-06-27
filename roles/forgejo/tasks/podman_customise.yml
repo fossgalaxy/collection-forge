@@ -9,7 +9,7 @@
     owner: "{{ forgejo_uid }}"
     group: "{{ forgejo_gid }}"
     mode: "0550"
-    setype: "{{ forgejo_custom_setype }}"
+    setype: "{{ forgejo_setype }}"
   with_items:
     - "{{ forgejo_custom_dir }}/templates"
     - "{{ forgejo_custom_dir }}/templates/custom"
@@ -32,7 +32,7 @@
     owner: "{{ forgejo_uid }}"
     group: "{{ forgejo_gid }}"
     mode: "0400"
-    setype: "{{ forgejo_custom_setype }}"
+    setype: "{{ forgejo_setype }}"
   with_items: "{{ forgejo_custom_labels }}"
   notify:
     - Restart Forgejo
@@ -45,7 +45,7 @@
     owner: "{{ forgejo_uid }}"
     group: "{{ forgejo_gid }}"
     mode: "0400"
-    setype: "{{ forgejo_custom_setype }}"
+    setype: "{{ forgejo_setype }}"
   with_items: "{{ forgejo_custom_licences }}"
   notify:
     - Restart Forgejo
@@ -58,7 +58,7 @@
     owner: "{{ forgejo_uid }}"
     group: "{{ forgejo_gid }}"
     mode: "0400"
-    setype: "{{ forgejo_custom_setype }}"
+    setype: "{{ forgejo_setype }}"
   loop: "{{ forgejo_custom_assets | dict2items }}"
   notify:
     - Restart Forgejo
@@ -71,7 +71,7 @@
     owner: "{{ forgejo_uid }}"
     group: "{{ forgejo_gid }}"
     mode: "0400"
-    setype: "{{ forgejo_custom_setype }}"
+    setype: "{{ forgejo_setype }}"
   loop: "{{ forgejo_custom_templates | dict2items }}"
   notify:
     - Restart Forgejo

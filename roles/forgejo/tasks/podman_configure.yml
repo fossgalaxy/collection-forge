@@ -9,7 +9,7 @@
     owner: "{{ forgejo_uid }}"
     group: "{{ forgejo_gid }}"
     mode: "0500"
-    setype: "{{ forgejo_custom_setype }}"
+    setype: "{{ forgejo_setype }}"
   with_items:
     - "{{ forgejo_custom_dir }}"
     - "{{ forgejo_custom_dir }}/conf"
@@ -22,6 +22,6 @@
     owner: "{{ forgejo_uid }}"
     group: "{{ forgejo_gid }}"
     mode: "0400"
-    setype: "{{ forgejo_custom_setype }}"
+    setype: "{{ forgejo_setype }}"
   notify:
     - Restart Forgejo
