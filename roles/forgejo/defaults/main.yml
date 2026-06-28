@@ -151,10 +151,10 @@ forgejo_oid_meta_url: ""
 forgejo_oid: "{{ forgejo_oid_meta_url | length > 0 }}"
 forgejo_oid_client: "{{ forgejo_service }}"
 
-forgejo_keycloak: "{{ forgejo_oid }}" # should we use the self-hosted role to configure keycloak?
+forgejo_keycloak: "{{ forgejo_oid and forgejo_oid_secret is not defined }}" # should we use the self-hosted role to configure keycloak?
 forgejo_keycloak_realm: "freeipa"
 
-forgejo_oid_provider_name: "freeipa"
+forgejo_oid_provider_name: "{{ forgejo_keycloak_realm }}"
 
 # FreeIPA trust
 forgejo_inject_cert: false
