@@ -17,15 +17,16 @@ DOMAIN = {{ forgejo_domain }}
 HTTP_PORT = 3000
 
 APP_DATA_PATH = {{ forgejo_dir_root }}
-SSH_DOMAIN = {{ forgejo_ssh_domain }}
 ROOT_URL = {{ forgejo_url }}
 OFFLINE_MODE = true
 
 ; SSH
-DISABLE_SSH = {% if forgejo_ssh_port %}false{% else %}true{% endif %}
-
+DISABLE_SSH = {{ not forgejo_ssh }}
+{% if forgejo_ssh %}
+SSH_DOMAIN = {{ forgejo_ssh_domain }}
 SSH_PORT = {{ forgejo_ssh_port }}
 SSH_LISTEN_PORT = 22
+{% endif %}
 
 ; LFS
 LFS_START_SERVER = true

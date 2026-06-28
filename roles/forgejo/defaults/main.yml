@@ -127,9 +127,10 @@ forgejo_web_port: 3000 # bind (host) port
 forgejo_expose_web_port: false
 forgejo_web_port_map: "{% if not forgejo_expose_web_port %}127.0.0.1:{% endif %}{{ forgejo_expose_web_port }}"
 
+# SSH integration
+forgejo_ssh: true
 forgejo_ssh_port: 2222 # bind (host) port
 forgejo_ssh_domain: "{{ forgejo_domain }}"
-
 
 # where should forgejo look for data?
 forgejo_dir_root: /data/gitea
@@ -168,3 +169,4 @@ forgejo_extra_labels: {}
 forgejo_extra_volumes: []
 forgejo_extra_secrets: []
 forgejo_extra_quadlet_options: []
+forgejo_extra_ports: []

@@ -36,6 +36,13 @@ forgejo_volumes: >-
     ]
   }}
 
+forgejo_ports: >-
+  {{
+    ((forgejo_ssh | bool) | ternary(
+      [ forgejo_ssh_port ~ ':22' ], []
+    ))
+  }}
+
 forgejo_labels: >-
   {{
     (forgejo_traefik | bool)

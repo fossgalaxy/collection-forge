@@ -81,6 +81,7 @@
     name: "{{ forgejo_service }}"
     image: "{{ forgejo_image }}"
     state: quadlet
+    ports: "{{ forgejo_ports }}"
     env: "{{ forgejo_env | combine(forgejo_extra_env) }}"
     secrets: "{{ forgejo_secrets + forgejo_extra_secrets }}"
     volumes: "{{ forgejo_volumes + forgejo_extra_volumes }}"
