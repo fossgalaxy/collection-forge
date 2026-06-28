@@ -29,8 +29,8 @@ forgejo_db_remote: "{{ ( forgejo_db_host != 'localhost' ) }}"
 # admin account (bootstrapping)
 ##
 forgejo_admin_create: true
-forgejo_admin_user: "ansible"
-forgejo_admin_email: "ansible@{{ forgejo_domain }}"
+forgejo_admin_user: "admin"
+forgejo_admin_email: "admin@{{ forgejo_domain }}"
 forgejo_admin_pw: ""
 
 ##

@@ -40,8 +40,8 @@ configuration file if the playbook options change.
 The playbook disables the 'install' script in the web browser, although it can provision an account for you.
 
 ```yaml
-# default user account name is ansible
-forgejo_admin_user: ansible
+# default user account name is admin
+forgejo_admin_user: admin
 forgejo_admin_pw:
 ```
 
