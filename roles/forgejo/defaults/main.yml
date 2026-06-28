@@ -46,6 +46,8 @@ forgejo_domain_noreply: "noreply.{{ forgejo_domain }}"
 forgejo_private_instance: true
 forgejo_privacy: true
 
+forgejo_moderation: false
+
 # Defaults
 forgejo_licences_preferred: []
 forgejo_private_email: "{{ forgejo_privacy }}"
@@ -151,6 +153,7 @@ forgejo_dir_git_lfs: "{{ forgejo_dir_git }}/lfs"
 forgejo_oid_meta_url: ""
 forgejo_oid: "{{ forgejo_oid_meta_url | length > 0 }}"
 forgejo_oid_client: "{{ forgejo_service }}"
+forgejo_oid_register: "{{ forgejo_register_force_external }}"
 
 forgejo_keycloak: "{{ forgejo_oid and forgejo_oid_secret is not defined }}" # should we use the self-hosted role to configure keycloak?
 forgejo_keycloak_realm: "freeipa"

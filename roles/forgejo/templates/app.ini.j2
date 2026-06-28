@@ -107,9 +107,15 @@ PREFERRED_LICENSES = {{ fg_forgejo_licences_preferred|join(',') }}
 [mailer]
 ENABLED = false
 
+[moderation]
+ENABLED = "{{ forgejo_moderation }}"
+
 [openid]
 ENABLE_OPENID_SIGNIN = {{ forgejo_signin_openid }}
 ENABLE_OPENID_SIGNUP = {{ forgejo_register_openid }}
+
+[oauth2_client]
+ENABLE_AUTO_REGISTRATION = {{ forgejo_oid_register }}
 
 [cron.update_checker]
 ENABLED = false
