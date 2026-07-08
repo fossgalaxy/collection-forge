@@ -1,0 +1,18 @@
+---
+# tasks file for git-pages
+
+- name: Validate container engine
+  ansible.builtin.assert:
+    that:
+      - gitpages_container_engine in ['podman']
+    fail_msg: "unsupported container engine: {{ gitpages_container_engine }}"
+  changed_when: false
+
+- name: Include container engine tasks
+  ansible.builtin.include_tasks: "engine_{{ gitpages_container_engine }}.yml"
+
+- name: Ensure service is running
+  become: true
+  ansible.builtin.service:
+    name: "{{ gitpages_service }}"
+    state: started

@@ -1,0 +1,16 @@
+---
+
+- name: Ensure container exists
+  become: true
+  containers.podman.podman_container:
+    name: "{{ gitpages_service }}"
+    image: "{{ gitpages_image }}"
+    state: quadlet
+    env: "{{ gitpages_env | combine(gitpages_extra_env) }}"
+    secrets: "{{ gitpages_secrets + gitpages_extra_secrets }}"
+    volumes: "{{ gitpages_volumes + gitpages_extra_volumes }}"
+    label: "{{ gitpages_labels | combine(gitpages_extra_labels ) }}"
+    quadlet_options: "{{ gitpages_quadlet_options + gitpages_extra_quadlet_options }}"
+  notify:
+    - Reload Git Pages
+

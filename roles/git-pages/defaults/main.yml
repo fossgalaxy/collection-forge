@@ -1,0 +1,62 @@
+---
+# defaults file for Git Pages
+
+gitpages_version: "latest"
+gitpages_image: "codeberg.org/git-pages/git-pages:{{ gitpages_version }}"
+
+gitpages_domain: ""
+gitpages_url: "https://{{ gitpages_domain }}"
+
+gitpages_container_engine: podman
+gitpages_service: "git-pages"
+
+# Storage
+gitpages_storage_type: "fs"
+
+# Storage: filesystem
+gitpages_fs_root: ""
+
+# Storage: s3 compatible
+gitpages_s3_endpoint: ""
+gitpages_s3_key_id: ""
+gitpages_s3_access_key: ""
+gitpages_s3_region: "us-east-1"
+
+# wildcard support
+gitpages_wildcard_domain: ""
+gitpages_wildcard_clone: "https://{{ gitpages_wildcard_domain }}/<user>/<project>.git"
+gitpages_wildcard_repo: ""
+gitpages_wildcard_branch: "main"
+
+# customisation hooks
+gitpages_extra_env: {}
+gitpages_extra_secrets: []
+gitpages_extra_volumes: []
+gitpages_extra_labels: {}
+gitpages_extra_quadlet_options: []
+
+#
+# reverse proxy: traefik
+gitpages_traefik: true
+gitpages_traefik_labels: >-
+  {{
+    (
+      {'traefik.enable': 'true'}
+    ) | combine(
+          (gitpages_traefik | default(true) | bool)
+          | ternary(
+              ([
+                {
+                  'key': 'traefik.http.routers.' ~ gitpages_service ~ '.rule',
+                  'value': 'Host(`' ~ gitpages_domain ~ '`)'
+                },
+                {
+                  'key': 'traefik.http.services.' ~ gitpages_service ~ '.loadbalancer.server.port',
+                  'value': '3000'
+                }
+              ] | ansible.builtin.items2dict),
+              {}
+          )
+      )
+  }}
+

@@ -1,0 +1,29 @@
+---
+# vars file for forgejo
+
+gitpages_env: >-
+  {{
+  }}
+
+gitpages_secrets: >-
+  {{
+  }}
+
+gitpages_volumes: >-
+  {{
+  }}
+
+gitpages_ports: >-
+  {{
+  }}
+
+gitpages_labels: >-
+  {{
+    (gitpages_traefik | bool)
+    | ternary(gitpages_traefik_labels, {})
+  }}
+
+gitpages_quadlet_options:
+  - |
+    [Install]
+    WantedBy={{ gitpages_quadlet_wanted_by }}
