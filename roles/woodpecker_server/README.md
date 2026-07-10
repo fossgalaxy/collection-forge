@@ -1,7 +1,7 @@
-Forgejo (FOSS Galaxy)
+Woodpecker CI (FOSS Galaxy)
 =========
 
-An Ansible role for deploying Forgejo, based around Podman and PostgreSQL.
+An Ansible role for deploying Woodpecker CI, based around Podman and PostgreSQL.
 
 Requirements
 ------------
@@ -22,14 +22,7 @@ Role Variables
 There are variables which must be set for this playbook to work correctly:
 
 ```
-fg_forgejo_db_password: db_password
-fg_forgejo_domain: domain name
 
-# secrets
-fg_forgejo_secret_key: secret key
-fg_forgejo_internal_token: token
-fg_forgejo_jwt_lfs: jwt token
-fg_forgejo_jwt_oauth: jwt token
 ```
 
 There are also variables to customise how Forgejo is deployed. The customisation directory is deployed into

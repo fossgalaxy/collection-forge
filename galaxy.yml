@@ -38,7 +38,8 @@ tags: ['linux']
 # range specifiers can be set and are separated by ','
 dependencies: {
   'community.postgresql': ">3.9",
-  'containers.podman': ">1.16.2"
+  'containers.podman': ">1.16.2",
+  'fossgalaxy.infra': "0.1.1"
 }
 
 # The URL of the originating SCM repository
