@@ -12,7 +12,7 @@ This role assumes you have the following already:
 * PostgreSQL Server
 
 For our purposes, we deploy PostgreSQL on the host and access it from the container. If you are not doing this
-you will need to set up a PostgreSQL container and alter the `fg_forgejo_db` variables accordingly. The
+you will need to set up a PostgreSQL container and alter the `forgejo_db` variables accordingly. The
 playbook can also manage the user and database (assuming the 'postgres on host' setup) - if you are
 not doing this turn the db management feature off.
 
@@ -22,14 +22,14 @@ Role Variables
 There are variables which must be set for this playbook to work correctly:
 
 ```
-fg_forgejo_db_password: db_password
-fg_forgejo_domain: domain name
+forgejo_db_password: db_password
+forgejo_domain: domain name
 
 # secrets
-fg_forgejo_secret_key: secret key
-fg_forgejo_internal_token: token
-fg_forgejo_jwt_lfs: jwt token
-fg_forgejo_jwt_oauth: jwt token
+forgejo_secret_key: secret key
+forgejo_internal_token: token
+forgejo_jwt_lfs: jwt token
+forgejo_jwt_oauth: jwt token
 ```
 
 There are also variables to customise how Forgejo is deployed. The customisation directory is deployed into
@@ -45,9 +45,26 @@ Example Playbook
 
 Including an example of how to use your role (for instance, with variables passed in as parameters) is always nice for users too:
 
-    - hosts: servers
-      roles:
-         - { role: username.rolename, x: 42 }
+```
+- hosts: apps.example.com
+  roles:
+    - role: fossgalaxy.infra.container_host
+    - role: fossgalaxy.forge.forgejo
+      vars:
+        forgejo_db_host: "psql.example.com"
+        forgejo_db_pw: "{{ vault_forgejo_db_pw }}"
+        forgejo_secretkey: "{{ vault_forgejo_secretkey }}"
+        forgejo_internal_token: "{{ vault_forgejo_internal_token }}"
+        forgejo_jwt_oauth: "{{ vault_forgejo_jwt_oauth }}"
+        forgejo_jwt_lfs: "{{ vault_forgejo_jwt_lfs }}"
+        forgejo_admin_pw: "{{ vault_forgejo_admin_pw }}"
+        #forgejo_oid_meta_url: "{{ homelab_autodiscover_url }}"
+        #forgejo_inject_cert: true
+        #forgejo_oid_secret: "{{ vault_forgejo_oid_secret }}"
+```
+
+Note - you do not need to use our container host role if your host is already being managed as a Podman server some other way. The role will set up Forgejo using quadlets. You
+may need to make changes to the bind mount locations if you do though.
 
 License
 -------
