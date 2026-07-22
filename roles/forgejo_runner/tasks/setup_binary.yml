@@ -1,0 +1,8 @@
+---
+
+- name: Ensure the configuration exists
+  ansible.builtin.template:
+    src: "forgejo-runner.service"
+    dest: "{{ forgejo_runner_unit_path }}"
+    owner: "{{ forgejo-runner }}"
+

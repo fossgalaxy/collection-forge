@@ -1,0 +1,17 @@
+---
+
+- name: Ensure podman socket is running
+  become: "{{ forgejo_runner_user }}"
+  ansible.builtin.systemd_service:
+    state: started
+    enabled: true
+    name: "podman.socket"
+    scope: user
+
+- name: Enable Linger for user
+  ansible.builtin.command:
+  argv:
+    - /usr/bin/loginctl
+    - enable-linger
+    - "{{ forgejo_runner_user }}"
+  creates: "/var/lib/systemd/linger/{{ forgejo_runner_user }}"
