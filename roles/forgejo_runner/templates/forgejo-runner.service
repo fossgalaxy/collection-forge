@@ -1,7 +1,7 @@
 [Unit]
 Description=Forgejo Runner
 Documentation=https://forgejo.org/docs/latest/admin/actions/
-After=docker.service
+After=podman.socket
 
 [Service]
 ExecStart=/usr/local/bin/forgejo-runner daemon -c /home/runner/runner-config.yml

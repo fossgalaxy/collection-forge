@@ -51,7 +51,10 @@ runner:
   #       backend-options:
   #         image: ghcr.io/freebsd/freebsd-runtime:15.0
   #         platform: freebsd/amd64
-  labels: []
+  labels:
+    {% for label in forgejo_runner_labels -%}
+    - {{ label }}
+    {% endfor %}
 
 cache:
   #
@@ -197,7 +200,7 @@ container:
   # If it's a url, the specified docker host will be mounted in the job container
   # Example urls: unix:///run/docker.socket or ssh://user@host
   # The specified socket is mounted within the job container at /var/run/docker.sock
-  docker_host: "-"
+  docker_host: "{{ forgejo_runner_docker_host }}"
   # Pull docker image(s) even if already present
   force_pull: false
   # Rebuild local docker image(s) even if already present

@@ -15,11 +15,13 @@ forgejo_runner_checksum: "{{ forgejo_runner_download }}.sha256"
 forgejo_runner_path: "/usr/local/bin/forgejo-runner"
 
 forgejo_runner_user: "runner"
+forgejo_runner_uid: 1000
+
 forgejo_runner_user_homedir: "/home/{{ forgejo_runner_user }}"
 
 forgejo_runner_config_path: "{{ forgejo_runner_user_homedir }}/runner-config.yml"
 forgejo_runner_token_path: "{{ forgejo_runner_user_homedir }}/token"
-forgejo_runner_unit_path: "/etc/systemd/user/forgejo-runner.service"
+forgejo_runner_unit_path: "/etc/systemd/system/forgejo-runner.service"
 
 forgejo_runner_log_level: "info"
 forgejo_runner_log_job_level: "{{ forgejo_runner_log_level }}"
@@ -32,6 +34,13 @@ forgejo_runner_timeout_fetch: "30s"
 
 forgejo_runner_interval_fetch: "2s"
 forgejo_runner_interval_report: "1s"
+
+forgejo_runner_labels:
+  - "ubuntu-latest:docker://node:lts"
+  - "docker:docker://node:lts"
+
+# engine: podman
+forgejo_runner_docker_host: "unix:///run/user/{{ forgejo_runner_uid }}/podman/podman.sock"
 
 # Where should we run forgejo cli commands?
 forgejo_runner_forgejo_host: ""

@@ -28,10 +28,14 @@
     dest: "{{ forgejo_runner_config_path }}"
     owner: "{{ forgejo_runner_user }}"
     mode: '0600'
+  notify:
+    - Restart Forgejo Runner
 
 - name: Ensure the service exists
   ansible.builtin.template:
     src: "forgejo-runner.service"
     dest: "{{ forgejo_runner_unit_path }}"
     owner: "{{ forgejo_runner_user }}"
+  notify:
+    - Reload Forgejo Runner
 
