@@ -16,3 +16,6 @@
 
 - name: Include setup tasks
   ansible.builtin.include_tasks: "setup_{{ forgejo_runner_method }}.yml"
+
+- name: Include engine tasks
+  ansible.builtin.include_tasks: "engine_{{ forgejo_runner_engine }}.yml"
