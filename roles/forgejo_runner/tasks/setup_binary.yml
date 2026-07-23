@@ -4,6 +4,7 @@
   become: true
   ansible.builtin.user:
     name: "{{forgejo_runner_user }}"
+    uid: "{{ forgejo_runner_uid }}"
     create_home: yes
 
 # TODO gpg validate binary
