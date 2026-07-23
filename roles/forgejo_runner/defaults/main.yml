@@ -2,18 +2,23 @@
 # defaults file for forgejo runner
 
 # version information
-forgejo_runner_version: "15"
+forgejo_runner_version: "12.13.1"
 forgejo_runner_arch: "amd64"
 forgejo_runner_os: "linux"
 
+forgejo_runner_method: binary
+forgejo_runner_engine: podman
+
 # runner: binary
 forgejo_runner_download: "https://code.forgejo.org/forgejo/runner/releases/download/v{{ forgejo_runner_version }}/forgejo-runner-{{ forgejo_runner_version }}-{{ forgejo_runner_os }}-{{ forgejo_runner_arch }}"
+forgejo_runner_checksum: "{{ forgejo_runner_download }}.sha256"
 forgejo_runner_path: "/usr/local/bin/forgejo-runner"
 
 forgejo_runner_user: "runner"
-forgejo_runner_type: "podman"
+forgejo_runner_user_homedir: "/home/{{ forgejo_runner_user }}"
 
-forgejo_runner_config: "/home/{{ forgejo_runner_user }}/runner-config.yml"
+forgejo_runner_config_path: "{{ forgejo_runner_user_homedir }}/runner-config.yml"
+forgejo_runner_token_path: "{{ forgejo_runner_user_homedir }}/token"
 forgejo_runner_unit_path: "/etc/systemd/user/forgejo-runner.service"
 
 forgejo_runner_log_level: "info"
@@ -29,6 +34,6 @@ forgejo_runner_interval_fetch: "2s"
 forgejo_runner_interval_report: "1s"
 
 # forgejo connection
-forgejo_runner_connection_url: ""
+forgejo_runner_connection_url: "https://{{ forgejo_domain|default('') }}/"
 forgejo_runner_connection_token: ""
 forgejo_runner_connection_uuid: ""

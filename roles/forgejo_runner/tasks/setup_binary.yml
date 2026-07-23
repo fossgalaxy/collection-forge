@@ -1,8 +1,52 @@
 ---
 
+- name: Ensure account for runner user exists
+  become: true
+  ansible.builtin.user:
+    name: "{{forgejo_runner_user }}"
+    create_home: yes
+
+# TODO gpg validate binary
+- name: Download forgejo runner
+  become: true
+  ansible.builtin.get_url:
+    url: "{{ forgejo_runner_download }}"
+    dest: "{{ forgejo_runner_path }}"
+    owner: root
+    mode: '0555'
+    checksum: "sha256:{{ forgejo_runner_checksum }}"
+
+- name: Check if token file exists
+  stat:
+    path: "{{ forgejo_runner_token_path }}"
+  register: forgejo_runner_token_exists
+  
+- name: Generate token file
+  when: not forgejo_runner_token_exists.stat.exists
+  block:
+    - name: Generate a random secret if one was not provided
+      when: "{{ forgejo_runner_connection_token|length == 0 }}"
+      ansible.builtin.set_fact:
+        forgejo_runner_connection_token: "{{ query('community.general.random_string', length=40, override_all=hex_chars)[0] }}"
+      vars:
+        hex_chars: '0123456789ABCDEF'
+
+    - name: Ensure token file exists
+      ansible.builtin.copy:
+        content: "{{ forgejo_runner_connection_token }}"
+        dest: "{{ forgejo_runner_token_path }}"
+        owner: "{{ forgejo_runner_user }}"
+
 - name: Ensure the configuration exists
+  ansible.builtin.template:
+    src: "runner-config.yml"
+    dest: "{{ forgejo_runner_config_path }}"
+    owner: "{{ forgejo_runner_user }}"
+    mode: '0600'
+
+- name: Ensure the service exists
   ansible.builtin.template:
     src: "forgejo-runner.service"
     dest: "{{ forgejo_runner_unit_path }}"
-    owner: "{{ forgejo-runner }}"
+    owner: "{{ forgejo_runner_user }}"
 

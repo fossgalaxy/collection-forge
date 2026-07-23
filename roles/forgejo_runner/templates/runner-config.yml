@@ -248,4 +248,4 @@ server:
     forgejo:
       url: "{{ forgejo_runner_connection_url }}"
       uuid: "{{ forgejo_runner_connection_uuid }}"
-      token: "{{ forgejo_runner_connection_token }}"
+      token_url: "file:{{ forgejo_runner_token_path }}"
