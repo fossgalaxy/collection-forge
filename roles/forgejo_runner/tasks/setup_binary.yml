@@ -1,0 +1,61 @@
+---
+
+# dependencies on the host
+- name: Ensure Git is installed
+  become: true
+  ansible.builtin.dnf:
+    name:
+      - git
+    state: installed
+
+- name: Ensure account for runner user exists
+  become: true
+  ansible.builtin.user:
+    name: "{{forgejo_runner_user }}"
+    uid: "{{ forgejo_runner_uid }}"
+    create_home: yes
+
+# TODO gpg validate binary
+- name: Download forgejo runner
+  become: true
+  ansible.builtin.get_url:
+    url: "{{ forgejo_runner_download }}"
+    dest: "{{ forgejo_runner_path }}"
+    owner: root
+    group: root
+    mode: '0555'
+    checksum: "sha256:{{ forgejo_runner_checksum }}"
+
+- name: Ensure token file exists
+  ansible.builtin.copy:
+    content: "{{ forgejo_runner_connection_token }}"
+    dest: "{{ forgejo_runner_token_path }}"
+    owner: "{{ forgejo_runner_user }}"
+    mode: '0600'
+
+- name: Ensure the configuration exists
+  ansible.builtin.template:
+    src: "runner-config.yml"
+    dest: "{{ forgejo_runner_config_path }}"
+    owner: "{{ forgejo_runner_user }}"
+    mode: '0600'
+  notify:
+    - Restart Forgejo Runner
+
+- name: Ensure the service exists
+  ansible.builtin.template:
+    src: "forgejo-runner.service"
+    dest: "{{ forgejo_runner_unit_path }}"
+    owner: "{{ forgejo_runner_user }}"
+  notify:
+    - Reload Forgejo Runner
+
+- name: Enable user service
+  become: yes
+  become_user: "{{ forgejo_runner_user }}"
+  ansible.builtin.systemd_service:
+    name: forgejo-runner.service
+    enabled: true
+    state: started
+    scope: user
+

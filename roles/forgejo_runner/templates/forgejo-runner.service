@@ -1,0 +1,19 @@
+[Unit]
+Description=Forgejo Runner
+Documentation=https://forgejo.org/docs/latest/admin/actions/
+Requires=podman.socket
+After=podman.socket
+
+[Service]
+ExecStart=/usr/local/bin/forgejo-runner daemon -c /home/runner/runner-config.yml
+ExecReload=/bin/kill -s HUP $MAINPID
+
+# This user and working directory must already exist
+WorkingDirectory=/home/runner
+Restart=on-failure
+# allow configured shutdown_timeout to be effective, rather than overridden by systemd
+TimeoutStopSec=infinity
+RestartSec=10
+
+[Install]
+WantedBy=default.target

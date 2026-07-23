@@ -1,0 +1,51 @@
+---
+# defaults file for forgejo runner
+
+# version information
+forgejo_runner_version: "12.13.1"
+forgejo_runner_arch: "amd64"
+forgejo_runner_os: "linux"
+
+forgejo_runner_method: binary
+forgejo_runner_engine: podman
+
+# runner: binary
+forgejo_runner_download: "https://code.forgejo.org/forgejo/runner/releases/download/v{{ forgejo_runner_version }}/forgejo-runner-{{ forgejo_runner_version }}-{{ forgejo_runner_os }}-{{ forgejo_runner_arch }}"
+forgejo_runner_checksum: "{{ forgejo_runner_download }}.sha256"
+forgejo_runner_path: "/usr/local/bin/forgejo-runner"
+
+forgejo_runner_user: "runner"
+forgejo_runner_uid: 1000
+
+forgejo_runner_user_homedir: "/home/{{ forgejo_runner_user }}"
+
+forgejo_runner_config_path: "{{ forgejo_runner_user_homedir }}/runner-config.yml"
+forgejo_runner_token_path: "{{ forgejo_runner_user_homedir }}/token"
+forgejo_runner_unit_path: "{{ forgejo_runner_user_homedir }}/.config/systemd/user/forgejo-runner.service"
+
+forgejo_runner_log_level: "info"
+forgejo_runner_log_job_level: "{{ forgejo_runner_log_level }}"
+
+forgejo_runner_concurrent: 1
+
+forgejo_runner_timeout: "3h"
+forgejo_runner_timeout_shutdown: "3h"
+forgejo_runner_timeout_fetch: "30s"
+
+forgejo_runner_interval_fetch: "2s"
+forgejo_runner_interval_report: "1s"
+
+forgejo_runner_labels:
+  - "ubuntu-latest:docker://node:lts"
+  - "docker:docker://node:lts"
+
+# engine: podman
+forgejo_runner_docker_host: "unix:///run/user/{{ forgejo_runner_uid }}/podman/podman.sock"
+
+# Where should we run forgejo cli commands?
+forgejo_runner_forgejo_host: ""
+
+# forgejo connection
+forgejo_runner_connection_url: "https://{{ forgejo_domain|default('') }}/"
+forgejo_runner_connection_token: ""
+forgejo_runner_connection_uuid: ""
