@@ -21,7 +21,7 @@ forgejo_runner_user_homedir: "/home/{{ forgejo_runner_user }}"
 
 forgejo_runner_config_path: "{{ forgejo_runner_user_homedir }}/runner-config.yml"
 forgejo_runner_token_path: "{{ forgejo_runner_user_homedir }}/token"
-forgejo_runner_unit_path: "/etc/systemd/system/forgejo-runner.service"
+forgejo_runner_unit_path: "{{ forgejo_runner_user_homedir }}/.config/systemd/user/forgejo-runner.service"
 
 forgejo_runner_log_level: "info"
 forgejo_runner_log_job_level: "{{ forgejo_runner_log_level }}"

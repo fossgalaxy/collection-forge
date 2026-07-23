@@ -13,6 +13,7 @@
     url: "{{ forgejo_runner_download }}"
     dest: "{{ forgejo_runner_path }}"
     owner: root
+    group: root
     mode: '0555'
     checksum: "sha256:{{ forgejo_runner_checksum }}"
 
@@ -21,6 +22,7 @@
     content: "{{ forgejo_runner_connection_token }}"
     dest: "{{ forgejo_runner_token_path }}"
     owner: "{{ forgejo_runner_user }}"
+    mode: '0600'
 
 - name: Ensure the configuration exists
   ansible.builtin.template:
@@ -38,4 +40,13 @@
     owner: "{{ forgejo_runner_user }}"
   notify:
     - Reload Forgejo Runner
+
+- name: Enable user service
+  become: yes
+  become_user: "{{ forgejo_runner_user }}"
+  ansible.builtin.systemd_service:
+    name: forgejo-runner.service
+    enabled: true
+    state: started
+    scope: user
 
