@@ -1,5 +1,13 @@
 ---
 
+# dependencies on the host
+- name: Ensure Git is installed
+  become: true
+  ansible.builtin.dnf:
+    name:
+      - git
+    state: installed
+
 - name: Ensure account for runner user exists
   become: true
   ansible.builtin.user:
