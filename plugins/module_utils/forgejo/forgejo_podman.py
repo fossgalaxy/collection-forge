@@ -50,6 +50,19 @@ def generate_token(module, token_type):
     rc, token_str, err = run_forgejo_cli(module, args=["generate", "secret", token_type])
     return token_str
 
+def create_runner(module, name, secret, scope=None):
+    """Create a runner using the admin CLI"""
+    args = [
+        "--name", name,
+        "--secret", secret
+    ]
+    
+    if scope:
+        args += ["--scope", scope]
+    
+    rc, out, err = run_forgejo_cli(module, args=["forgejo-cli", "actions", "register"] + args)
+    return out
+    
 
 def create_ldap(module, hostname, search_base,
                 *,

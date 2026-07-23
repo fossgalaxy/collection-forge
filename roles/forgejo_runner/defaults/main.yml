@@ -33,6 +33,9 @@ forgejo_runner_timeout_fetch: "30s"
 forgejo_runner_interval_fetch: "2s"
 forgejo_runner_interval_report: "1s"
 
+# Where should we run forgejo cli commands?
+forgejo_runner_forgejo_host: ""
+
 # forgejo connection
 forgejo_runner_connection_url: "https://{{ forgejo_domain|default('') }}/"
 forgejo_runner_connection_token: ""

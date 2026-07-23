@@ -9,7 +9,7 @@ log:
 
 runner:
   file: .runner
-  capacity: "{{ forgejo_runner_concurrent }}"
+  capacity: {{ forgejo_runner_concurrent }}
   # Extra environment variables to run jobs.
   envs:
     A_TEST_ENV_NAME_1: a_test_env_value_1
