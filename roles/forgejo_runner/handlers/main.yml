@@ -5,6 +5,7 @@
   become_user: "{{ forgejo_runner_user }}"
   ansible.builtin.systemd_service:
     daemon_reload: true
+    scope: user
     name: forgejo-runner
     state: restarted
 
@@ -12,5 +13,6 @@
   become: true
   become_user: "{{ forgejo_runner_user }}"
   ansible.builtin.systemd_service:
+    scope: user
     name: forgejo-runner
     state: restarted

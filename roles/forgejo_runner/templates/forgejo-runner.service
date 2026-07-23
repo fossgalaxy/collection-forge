@@ -16,4 +16,4 @@ TimeoutStopSec=infinity
 RestartSec=10
 
 [Install]
-WantedBy=multi-user.target
+WantedBy=default.target
