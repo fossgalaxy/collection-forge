@@ -2,7 +2,7 @@
 # defaults file for forgejo runner
 
 # version information
-forgejo_runner_version: "12.13.1"
+forgejo_runner_version: "12.13.2"
 forgejo_runner_arch: "amd64"
 forgejo_runner_os: "linux"
 
