@@ -21,9 +21,9 @@ forgejo_db: true
 forgejo_db_host: "host.containers.internal"
 forgejo_db_name: "{{ forgejo_service }}"
 forgejo_db_owner: "{{ forgejo_service }}_admin"
-forgejo_db_user: "{{ forgejo_service}}_app"
+forgejo_db_user: "{{ forgejo_service }}_app"
 forgejo_db_pw: ""
-forgejo_db_remote: "{{ ( forgejo_db_host != 'localhost' ) }}"
+forgejo_db_remote: "{{ (forgejo_db_host != 'localhost') }}"
 
 ##
 # admin account (bootstrapping)

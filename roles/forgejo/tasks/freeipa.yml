@@ -12,7 +12,6 @@
 #      userPassword:
 #      passwordExpirationTime:
 
-
 - name: freeipa | Ensure FreeIPA Provider exists
   fossgalaxy.forge.forgejo_ldap:
     hostname: "{{ fg_forgejo_ldap_host }}"

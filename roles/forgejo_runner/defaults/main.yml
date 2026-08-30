@@ -46,6 +46,6 @@ forgejo_runner_docker_host: "unix:///run/user/{{ forgejo_runner_uid }}/podman/po
 forgejo_runner_forgejo_host: ""
 
 # forgejo connection
-forgejo_runner_connection_url: "https://{{ forgejo_domain|default('') }}/"
+forgejo_runner_connection_url: "https://{{ forgejo_domain | default('') }}/"
 forgejo_runner_connection_token: ""
 forgejo_runner_connection_uuid: ""

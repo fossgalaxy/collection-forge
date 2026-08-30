@@ -85,7 +85,7 @@
     env: "{{ forgejo_env | combine(forgejo_extra_env) }}"
     secrets: "{{ forgejo_secrets + forgejo_extra_secrets }}"
     volumes: "{{ forgejo_volumes + forgejo_extra_volumes }}"
-    label: "{{ forgejo_labels | combine(forgejo_extra_labels ) }}"
+    label: "{{ forgejo_labels | combine(forgejo_extra_labels) }}"
     quadlet_options: "{{ forgejo_quadlet_options + forgejo_extra_quadlet_options }}"
   notify:
     - Reload Forgejo

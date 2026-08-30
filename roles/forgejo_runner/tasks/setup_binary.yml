@@ -11,9 +11,9 @@
 - name: Ensure account for runner user exists
   become: true
   ansible.builtin.user:
-    name: "{{forgejo_runner_user }}"
+    name: "{{ forgejo_runner_user }}"
     uid: "{{ forgejo_runner_uid }}"
-    create_home: yes
+    create_home: true
 
 # TODO gpg validate binary
 - name: Download forgejo runner
@@ -47,15 +47,15 @@
     src: "forgejo-runner.service"
     dest: "{{ forgejo_runner_unit_path }}"
     owner: "{{ forgejo_runner_user }}"
+    mode: '0600'
   notify:
     - Reload Forgejo Runner
 
 - name: Enable user service
-  become: yes
+  become: true
   become_user: "{{ forgejo_runner_user }}"
   ansible.builtin.systemd_service:
     name: forgejo-runner.service
     enabled: true
     state: started
     scope: user
-

@@ -1,3 +1,4 @@
+---
 galaxy_info:
   author: Joseph Walton-Rivers
   description: A role for deploying Forgejo in Podman

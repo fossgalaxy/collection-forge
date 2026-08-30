@@ -31,7 +31,7 @@ yamllint:
     yamllint .
 
 ansible-lint:
-    ansible-lint
+    ansible-lint -c .ansible-lint
 
 # ------------------------------------------------------------
 # Ansible sanity tests (collection-aware)

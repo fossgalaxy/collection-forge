@@ -1,6 +1,9 @@
 ---
 extends: default
 
+ignore: |
+  .venv/
+
 rules:
   # Required by ansible-lint
   comments:
