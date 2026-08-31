@@ -23,7 +23,7 @@ penpot_fe_env: >-
 penpot_fe_volumes: >-
   {{
     [
-      penpot_volume_assets ~ ":/opt/data/assets:Z"
+      penpot_volume_assets ~ ".volume:/opt/data/assets:rw"
     ]
   }}
 
@@ -57,6 +57,8 @@ penpot_be_env: >-
       'PENPOT_HTTP_SERVER_MAX_BODY_SIZE': penpot_http_max_body_size,
       'PENPOT_HTTP_SERVER_MAX_MULTIPART_BODY_SIZE': penpot_http_max_body_size,
       'PENPOT_REDIS_URI': penpot_redis_uri,
+      'PENPOT_OBJECTS_STORAGE_BACKEND': 'fs',
+      'PENPOT_OBJECTS_STORAGE_FS_DIRECTORY': '/opt/data/assets',
       'PENPOT_SSRF_ALLOWED_HOSTS': penpot_be_allowed_hosts | join(' '),
       'PENPOT_TELEMETRY_ENABLED': penpot_telemetry_enabled,
       'PENPOT_TELEMETRY_REFERER': penpot_telemetry_referer
@@ -102,7 +104,7 @@ penpot_be_volumes: >-
       [ penpot_bind_castore_location ~ ':' ~ penpot_app_cert_castore ~ ":ro,Z" ], []
     ))
     + [
-      penpot_volume_assets ~ ":/opt/data/assets:Z"
+      penpot_volume_assets ~ ".volume:/opt/data/assets:rw"
     ]
   }}
 
