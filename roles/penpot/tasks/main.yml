@@ -1,0 +1,16 @@
+---
+# tasks file for Penpot
+
+- name: Validate container engine
+  ansible.builtin.assert:
+    that:
+      - penpot_container_engine in ['podman']
+    fail_msg: "unsupported container engine: {{ penpot_container_engine }}"
+  changed_when: false
+  tags:
+    - penpot
+
+- name: Include container engine tasks
+  ansible.builtin.include_tasks: "engine_{{ penpot_container_engine }}.yml"
+  tags:
+    - penpot

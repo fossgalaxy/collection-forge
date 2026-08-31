@@ -1,0 +1,40 @@
+---
+
+- name: Reload Penpot Frontend
+  become: true
+  ansible.builtin.systemd_service:
+    daemon_reload: true
+    name: "{{ penpot_fe_service }}"
+    state: restarted
+
+- name: Reload Penpot Backend
+  become: true
+  ansible.builtin.systemd_service:
+    daemon_reload: true
+    name: "{{ penpot_be_service }}"
+    state: restarted
+
+- name: Reload Penpot Exporter
+  become: true
+  ansible.builtin.systemd_service:
+    daemon_reload: true
+    name: "{{ penpot_exporter_service }}"
+    state: restarted
+
+- name: Restart Penpot Frontend
+  become: true
+  ansible.builtin.systemd_service:
+    name: "{{ penpot_fe_service }}"
+    state: restarted
+
+- name: Restart Penpot Backend
+  become: true
+  ansible.builtin.systemd_service:
+    name: "{{ penpot_be_service }}"
+    state: restarted
+
+- name: Restart Penpot Exporter
+  become: true
+  ansible.builtin.systemd_service:
+    name: "{{ penpot_exporter_service }}"
+    state: restarted
