@@ -67,6 +67,7 @@ penpot_oid_meta_url: ""
 penpot_oid: "{{ penpot_oid_meta_url | length > 0 }}"
 penpot_oid_client: "{{ penpot_service_prefix }}"
 penpot_oid_register: "{{ penpot_register_force_external }}"
+penpot_oid_displayname: "OpenID"
 
 penpot_keycloak: "{{ penpot_oid and penpot_oid_secret is not defined }}" # should we use the self-hosted role to configure keycloak?
 penpot_keycloak_realm: "freeipa"

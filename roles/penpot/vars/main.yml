@@ -16,7 +16,8 @@ penpot_fe_env: >-
       'PENPOT_PUBLIC_URI': penpot_url,
       'PENPOT_FLAGS': penpot_resolved_flags | join(' '),
       'PENPOT_HTTP_SERVER_MAX_BODY_SIZE': penpot_http_max_body_size,
-      'PENPOT_HTTP_SERVER_MAX_MULTIPART_BODY_SIZE': penpot_http_max_body_size
+      'PENPOT_HTTP_SERVER_MAX_MULTIPART_BODY_SIZE': penpot_http_max_body_size,
+      'PENPOT_OIDC_NAME': penpot_oid_displayname
     }
   }}
 
