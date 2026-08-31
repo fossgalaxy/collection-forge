@@ -135,7 +135,7 @@ penpot_host_castore_location: /etc/pki/ca-trust/extracted/java/cacerts
 penpot_bind_castore_location: "{{ penpot_bind_dir }}/cacerts"
 
 penpot_app_cert_dir: /opt/jre/lib/security/
-penpot_app_cert_castore: "{{ penpot_app_cert_dir }}/cacerts"
+penpot_app_cert_castore: "{{ penpot_app_cert_dir }}cacerts"
 
 # Extra environment hook
 penpot_extra_env: {}
