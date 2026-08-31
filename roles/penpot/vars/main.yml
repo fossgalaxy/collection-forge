@@ -57,7 +57,9 @@ penpot_be_env: >-
       'PENPOT_HTTP_SERVER_MAX_BODY_SIZE': penpot_http_max_body_size,
       'PENPOT_HTTP_SERVER_MAX_MULTIPART_BODY_SIZE': penpot_http_max_body_size,
       'PENPOT_REDIS_URI': penpot_redis_uri,
-      'PENPOT_SSRF_ALLOWED_HOSTS': penpot_be_allowed_hosts | join(' ')
+      'PENPOT_SSRF_ALLOWED_HOSTS': penpot_be_allowed_hosts | join(' '),
+      'PENPOT_TELEMETRY_ENABLED': penpot_telemetry_enabled,
+      'PENPOT_TELEMETRY_REFERER': penpot_telemetry_referer
     }
     | combine((penpot_db | bool) | ternary({
      	  'PENPOT_DATABASE_URI': "postgresql://" ~ penpot_db_host ~ "/" ~ penpot_db_name,

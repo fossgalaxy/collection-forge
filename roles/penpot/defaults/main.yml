@@ -58,7 +58,7 @@ penpot_default_flags:
 
 # Telemetry
 penpot_telemetry_enabled: false
-penpot_telemetry_referer: "compose"
+penpot_telemetry_referer: "fossgalaxy-ansible"
 
 penpot_mcp: false
 
