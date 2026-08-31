@@ -68,13 +68,13 @@ penpot_be_env: >-
      	  'PENPOT_OIDC_BASE_URI': penpot_oid_meta_url
      	}, {}))
     | combine((penpot_smtp | bool) | ternary({
-     	  'PENPOT_SMTP_DEFAULT_FROM': '',
-     	  'PENPOT_SMTP_DEFAULT_REPLY_TO': '',
-     	  'PENPOT_SMTP_HOST': '',
-     	  'PENPOT_SMTP_PORT': '',
-     	  'PENPOT_SMTP_USERNAME': '',
-     	  'PENPOT_SMTP_TLS': '',
-     	  'PENPOT_SMTP_SSL': ''
+     	  'PENPOT_SMTP_DEFAULT_FROM': penpot_smtp_default_from,
+     	  'PENPOT_SMTP_DEFAULT_REPLY_TO': penpot_smtp_default_reply_to,
+     	  'PENPOT_SMTP_HOST': penpot_smtp_host,
+     	  'PENPOT_SMTP_PORT': penpot_smtp_port,
+     	  'PENPOT_SMTP_USERNAME': penpot_smtp_user,
+     	  'PENPOT_SMTP_TLS': penpot_smtp_tls,
+     	  'PENPOT_SMTP_SSL': penpot_smtp_ssl
      	}, {}))
   }}
 
@@ -84,7 +84,7 @@ penpot_be_secrets: >-
       [ penpot_secret_db_password ~ ',type=env,target=PENPOT_DATABASE_PASSWORD' ], []
     )) +
     ((penpot_smtp | bool) | ternary(
-      [ penpot_secret_db_password ~ ',type=env,target=PENPOT_SMTP_PASSWORD' ], []
+      [ penpot_secret_smtp_password ~ ',type=env,target=PENPOT_SMTP_PASSWORD' ], []
     )) +
     ((penpot_oid | bool) | ternary(
       [ penpot_secret_oid_password ~ ',type=env,target=PENPOT_OIDC_CLIENT_SECRET' ], []

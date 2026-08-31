@@ -36,7 +36,7 @@ penpot_smtp: false
 penpot_smtp_default_from: "no-reply@{{ penpot_domain }}"
 penpot_smtp_default_reply_to: "{{ penpot_smtp_default_from }}"
 penpot_smtp_host: "localhost"
-penpot_smtp_port: "25"
+penpot_smtp_port: 25
 penpot_smtp_user: "{{ penpot_service_prefix }}"
 penpot_smtp_pw: ""
 penpot_smtp_tls: false
@@ -93,6 +93,7 @@ penpot_volume_assets: "{{ penpot_service_prefix }}_assets"
 # secret names
 penpot_secret_secretkey: "{{ penpot_service_prefix }}_secretkey"
 penpot_secret_db_password: "{{ penpot_service_prefix }}_db_pass"
+penpot_secret_smtp_password: "{{ penpot_service_prefix }}_smtp_pass"
 penpot_secret_oid_password: "{{ penpot_service_prefix }}_oidc_pass"
 
 # user ids
