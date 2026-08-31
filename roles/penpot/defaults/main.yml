@@ -4,9 +4,6 @@
 # version information
 penpot_version: "2.16"
 
-penpot_mcp_version: "{{ penpot_version }}"
-penpot_mcp_image: "docker.io/penpotapp/mcp:{{ penpot_mcp_version }}"
-
 penpot_domain: ""
 penpot_url: "https://{{ penpot_domain }}"
 
@@ -60,7 +57,10 @@ penpot_default_flags:
 penpot_telemetry_enabled: false
 penpot_telemetry_referer: "fossgalaxy-ansible"
 
-penpot_mcp: false
+# we don't support deploying the mcp right now...
+#penpot_mcp: false
+#penpot_mcp_version: "{{ penpot_version }}"
+#penpot_mcp_image: "docker.io/penpotapp/mcp:{{ penpot_mcp_version }}"
 
 # Integration: OpenID
 penpot_oid_meta_url: ""
