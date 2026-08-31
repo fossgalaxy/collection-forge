@@ -1,0 +1,51 @@
+---
+
+- name: Validate OIDC base vars
+  ansible.builtin.assert:
+    that:
+      - penpot_oid_client is string and penpot_oid_client | length > 0
+      - penpot_oid_client is match("^[a-zA-Z0-9._-]+$")
+    fail_msg: "OIDC enabled but client ID is missing/empty."
+  changed_when: false
+
+- name: Validate OIDC vars (external provider)
+  ansible.builtin.assert:
+    that:
+      - penpot_oid_meta_url is string and penpot_oid_meta_url | length > 0
+      - penpot_oid_secret is string and penpot_oid_secret | length > 0
+    fail_msg: "External OIDC selected but required variables are missing/empty."
+  when: not penpot_keycloak | bool
+  changed_when: false
+
+- name: Ensure client exists
+  no_log: true
+  ansible.builtin.include_role:
+    name: "fossgalaxy.selfhosted.keycloak_client"
+    tasks_from: ensure_client.yml
+  vars:
+    kc_client_id: "{{ penpot_oid_client }}"
+    kc_client_name: "{{ penpot_name }}"
+    kc_realm: "{{ penpot_keycloak_realm }}"
+    kc_root_url: "{{ penpot_url }}"
+    kc_redirect_uris:
+      - "{{ penpot_url }}/api/auth/oidc/callback"
+    kc_output_var: penpot_oid_details
+  when: penpot_keycloak | bool
+
+- name: Set effective OIDC secret
+  ansible.builtin.set_fact:
+    penpot_effective_oid_secret: >-
+      {{
+        (penpot_oid_details.client_secret
+          if penpot_keycloak | bool
+          else penpot_oid_secret)
+      }}
+  no_log: true
+
+- name: Ensure secret for openid exists
+  become: true
+  no_log: true
+  containers.podman.podman_secret:
+    state: present
+    name: "{{ penpot_secret_oid_password }}"
+    data: "{{ penpot_effective_oid_secret }}"

@@ -1,0 +1,152 @@
+---
+# vars file for penpot
+
+# dynamically enable feature flags
+penpot_resolved_flags: >-
+  {{
+    penpot_default_flags +
+     ( penpot_oid | bool ) 
+     | ternary( [ "enable-login-with-oidc" ], [] )
+  }}
+
+# Frontend Vars
+penpot_fe_env: >-
+  {{
+    {
+      'PENPOT_PUBLIC_URI': penpot_url,
+      'PENPOT_FLAGS': penpot_resolved_flags | join(' '),
+      'PENPOT_HTTP_SERVER_MAX_BODY_SIZE': penpot_http_max_body_size,
+      'PENPOT_HTTP_SERVER_MAX_MULTIPART_BODY_SIZE': penpot_http_max_body_size,
+      'PENPOT_OIDC_NAME': penpot_oid_displayname
+    }
+  }}
+
+penpot_fe_volumes: >-
+  {{
+    [
+      penpot_volume_assets ~ ".volume:/opt/data/assets:rw"
+    ]
+  }}
+
+# no known required forwarded ports
+penpot_fe_ports: []
+
+penpot_fe_labels: >-
+  {{
+    (penpot_traefik | bool)
+    | ternary(penpot_traefik_labels, {})
+  }}
+
+penpot_fe_quadlet_options:
+  - |
+    [Unit]
+    Wants={{ penpot_be_service }}.container
+    After={{ penpot_be_service }}.container
+    Requires={{ penpot_be_service }}.container
+    Wants={{ penpot_exporter_service }}.container
+    After={{ penpot_exporter_service }}.container
+    Requires={{ penpot_exporter_service }}.container
+    [Install]
+    WantedBy={{ penpot_fe_quadlet_wanted_by }}
+
+# Backend Vars
+penpot_be_env: >-
+  {{
+    {
+      'PENPOT_PUBLIC_URI': penpot_url,
+      'PENPOT_FLAGS': penpot_resolved_flags | join(' '),
+      'PENPOT_HTTP_SERVER_MAX_BODY_SIZE': penpot_http_max_body_size,
+      'PENPOT_HTTP_SERVER_MAX_MULTIPART_BODY_SIZE': penpot_http_max_body_size,
+      'PENPOT_REDIS_URI': penpot_redis_uri,
+      'PENPOT_OBJECTS_STORAGE_BACKEND': 'fs',
+      'PENPOT_OBJECTS_STORAGE_FS_DIRECTORY': '/opt/data/assets',
+      'PENPOT_SSRF_ALLOWED_HOSTS': penpot_be_allowed_hosts | join(' '),
+      'PENPOT_TELEMETRY_ENABLED': penpot_telemetry_enabled,
+      'PENPOT_TELEMETRY_REFERER': penpot_telemetry_referer
+    }
+    | combine((penpot_db | bool) | ternary({
+     	  'PENPOT_DATABASE_URI': "postgresql://" ~ penpot_db_host ~ "/" ~ penpot_db_name,
+     	  'PENPOT_DATABASE_USERNAME': penpot_db_user,
+     	}, {}))
+    | combine((penpot_oid | bool) | ternary({
+        'PENPOT_OIDC_CLIENT_ID': penpot_oid_client,
+     	  'PENPOT_OIDC_BASE_URI': penpot_oid_meta_url
+     	}, {}))
+    | combine((penpot_smtp | bool) | ternary({
+     	  'PENPOT_SMTP_DEFAULT_FROM': penpot_smtp_default_from,
+     	  'PENPOT_SMTP_DEFAULT_REPLY_TO': penpot_smtp_default_reply_to,
+     	  'PENPOT_SMTP_HOST': penpot_smtp_host,
+     	  'PENPOT_SMTP_PORT': penpot_smtp_port,
+     	  'PENPOT_SMTP_USERNAME': penpot_smtp_user,
+     	  'PENPOT_SMTP_TLS': penpot_smtp_tls,
+     	  'PENPOT_SMTP_SSL': penpot_smtp_ssl
+     	}, {}))
+  }}
+
+penpot_be_secrets: >-
+  {{
+    ((penpot_db | bool) | ternary(
+      [ penpot_secret_db_password ~ ',type=env,target=PENPOT_DATABASE_PASSWORD' ], []
+    )) +
+    ((penpot_smtp | bool) | ternary(
+      [ penpot_secret_smtp_password ~ ',type=env,target=PENPOT_SMTP_PASSWORD' ], []
+    )) +
+    ((penpot_oid | bool) | ternary(
+      [ penpot_secret_oid_password ~ ',type=env,target=PENPOT_OIDC_CLIENT_SECRET' ], []
+    )) +
+    [
+      penpot_secret_secretkey ~ ',type=env,target=PENPOT_SECRET_KEY'
+    ]
+  }}
+
+penpot_be_volumes: >-
+  {{
+    ((penpot_inject_cert | bool) | ternary(
+      [ penpot_bind_castore_location ~ ':' ~ penpot_app_cert_castore ~ ":ro,Z" ], []
+    ))
+    + [
+      penpot_volume_assets ~ ".volume:/opt/data/assets:rw"
+    ]
+  }}
+
+# no known required forwarded ports
+penpot_be_ports: []
+
+penpot_be_quadlet_options:
+  - |
+    [Unit]
+    Wants={{ penpot_valkey_service }}.container
+    After={{ penpot_valkey_service }}.container
+    Requires={{ penpot_valkey_service }}.container
+    [Install]
+    WantedBy={{ penpot_be_quadlet_wanted_by }}
+
+# Exporter Vars
+penpot_exporter_env: >-
+  {{
+    {
+      'PENPOT_PUBLIC_URI': penpot_url,
+      'PENPOT_INTERNAL_URI': 'http://' ~ penpot_fe_service ~ ':8080',
+      'PENPOT_REDIS_URI': penpot_redis_uri
+    }
+  }}
+
+penpot_exporter_secrets: >-
+  {{ [
+      penpot_secret_secretkey ~ ',type=env,target=PENPOT_SECRET_KEY'
+    ] }}
+
+penpot_exporter_volumes: []
+
+# no known required forwarded ports
+penpot_exporter_ports: []
+
+penpot_exporter_quadlet_options:
+  - |
+    [Unit]
+    Wants={{ penpot_valkey_service }}.container
+    After={{ penpot_valkey_service }}.container
+    Requires={{ penpot_valkey_service }}.container
+    [Install]
+    WantedBy={{ penpot_be_quadlet_wanted_by }}
+

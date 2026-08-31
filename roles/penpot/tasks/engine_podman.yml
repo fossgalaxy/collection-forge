@@ -1,0 +1,117 @@
+---
+
+- name: Ensure podman database is setup
+  ansible.builtin.include_tasks: "podman_postgres.yml"
+  when: penpot_db | bool
+
+- name: Ensure quadlet directory exists
+  become: true
+  ansible.builtin.file:
+    path: "{{ penpot_quadlet_dir }}"
+    state: directory
+    mode: '0600'
+    owner: root
+    group: root
+  when: penpot_quadlet_dir != "/etc/containers/systemd/"
+
+- name: Copy the certs if required
+  ansible.builtin.include_tasks: "podman_tls.yml"
+  when: penpot_inject_cert
+  tags:
+    - penpot
+
+- name: Ensure assets volume exists
+  become: true
+  containers.podman.podman_volume:
+    state: quadlet
+    name: "{{ penpot_volume_assets }}"
+    quadlet_dir: "{{ penpot_quadlet_dir }}"
+  notify:
+    - Reload Penpot Frontend
+    - Reload Penpot Backend
+
+- name: Validate secret vars
+  ansible.builtin.assert:
+    that:
+      - penpot_secretkey is string and penpot_secretkey | length > 0
+  changed_when: false
+
+- name: Ensure secret for secret key exists
+  become: true
+  no_log: true
+  containers.podman.podman_secret:
+    state: present
+    name: "{{ penpot_secret_secretkey }}"
+    data: "{{ penpot_secretkey }}"
+  notify:
+    - Reload Penpot Backend
+
+- name: Ensure penpot network exists
+  become: true
+  containers.podman.podman_network:
+    name: "{{ penpot_network }}"
+    internal: "{{ penpot_network_internal }}"
+    state: quadlet
+    quadlet_dir: "{{ penpot_quadlet_dir }}"
+
+- name: Ensure valkey container exists
+  no_log: true
+  ansible.builtin.include_role:
+    name: "fossgalaxy.infra.valkey"
+  vars:
+    valkey_service: "{{ penpot_valkey_service }}"
+    valkey_network: "{{ penpot_network }}.network"
+    valkey_systemd_dir: "{{ penpot_quadlet_dir }}"
+
+- name: Ensure Backend container exists
+  become: true
+  containers.podman.podman_container:
+    name: "{{ penpot_be_service }}"
+    image: "{{ penpot_be_image }}"
+    network: "{{ penpot_network }}.network"
+    state: quadlet
+    quadlet_dir: "{{ penpot_quadlet_dir }}"
+    env: "{{ penpot_be_env | combine(penpot_be_extra_env) }}"
+    secrets: "{{ penpot_be_secrets + penpot_be_extra_secrets }}"
+    volumes: "{{ penpot_be_volumes + penpot_be_extra_volumes }}"
+    label: "{{ penpot_be_extra_labels }}"
+    quadlet_options: "{{ penpot_be_quadlet_options + penpot_be_extra_quadlet_options }}"
+  notify:
+    - Reload Penpot Backend
+
+- name: Ensure exporter container exists
+  become: true
+  containers.podman.podman_container:
+    name: "{{ penpot_exporter_service }}"
+    image: "{{ penpot_exporter_image }}"
+    network: "{{ penpot_network }}.network"
+    state: quadlet
+    quadlet_dir: "{{ penpot_quadlet_dir }}"
+    env: "{{ penpot_exporter_env | combine(penpot_exporter_extra_env) }}"
+    secrets: "{{ penpot_exporter_secrets + penpot_exporter_extra_secrets }}"
+    volumes: "{{ penpot_exporter_volumes + penpot_exporter_extra_volumes }}"
+    label: "{{ penpot_exporter_extra_labels }}"
+    quadlet_options: "{{ penpot_exporter_quadlet_options + penpot_exporter_extra_quadlet_options }}"
+  notify:
+    - Reload Penpot Backend
+
+- name: Ensure Frontend container exists
+  become: true
+  containers.podman.podman_container:
+    name: "{{ penpot_fe_service }}"
+    image: "{{ penpot_fe_image }}"
+    network: "{{ penpot_network }}.network"
+    state: quadlet
+    quadlet_dir: "{{ penpot_quadlet_dir }}"
+    env: "{{ penpot_fe_env | combine(penpot_fe_extra_env) }}"
+    secrets: "{{ penpot_fe_extra_secrets }}"
+    volumes: "{{ penpot_fe_volumes + penpot_fe_extra_volumes }}"
+    label: "{{ penpot_fe_labels | combine(penpot_fe_extra_labels) }}"
+    quadlet_options: "{{ penpot_fe_quadlet_options + penpot_fe_extra_quadlet_options }}"
+  notify:
+    - Reload Penpot Frontend
+
+- name: Include OpenID tasks
+  ansible.builtin.include_tasks: podman_openid.yml
+  when: penpot_oid
+
