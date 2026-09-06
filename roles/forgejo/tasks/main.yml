@@ -10,9 +10,3 @@
 
 - name: Include container engine tasks
   ansible.builtin.include_tasks: "engine_{{ forgejo_container_engine }}.yml"
-
-- name: Ensure service is running
-  become: true
-  ansible.builtin.service:
-    name: forgejo
-    state: started
