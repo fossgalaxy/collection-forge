@@ -1,0 +1,35 @@
+---
+
+- name: Validate db vars
+  ansible.builtin.assert:
+    that:
+      - penpot_db_host is string and penpot_db_host | length > 0
+      - penpot_db_name is string and penpot_db_name | length > 0
+      - penpot_db_owner is string and penpot_db_owner | length > 0
+      - penpot_db_user is string and penpot_db_user | length > 0
+      - penpot_db_pw is string and penpot_db_pw | length > 0
+
+- name: Ensure DB exists
+  no_log: true
+  ansible.builtin.include_role:
+    name: "fossgalaxy.infra.postgres_db"
+    tasks_from: "ensure_db.yml"
+  vars:
+    pg_host: "{{ penpot_db_host }}"
+    pg_db: "{{ penpot_db_name }}"
+    pg_owner: "{{ penpot_db_owner }}"
+    pg_app_user: "{{ penpot_db_user }}"
+    pg_app_password: "{{ penpot_db_pw }}"
+    pg_app_inherits_owner: true
+    pg_remote: "{{ penpot_db_remote }}"
+  when: penpot_db | bool
+
+- name: Ensure secret for database password exists
+  become: true
+  no_log: true
+  containers.podman.podman_secret:
+    state: present
+    name: "{{ penpot_secret_db_password }}"
+    data: "{{ penpot_db_pw }}"
+  notify:
+    - Restart Penpot Backend

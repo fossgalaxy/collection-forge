@@ -1,0 +1,22 @@
+---
+# We need to inject the FreeIPA cert into the container, else SSO fails
+# We don't really want to mount the host's truststore directly, because selinux.
+
+- name: Create Penpot bind directory
+  become: true
+  ansible.builtin.file:
+    path: "{{ penpot_bind_dir }}"
+    state: directory
+    owner: root
+    group: root
+    mode: '0755'
+
+- name: Copy host Java CA store for Penpot
+  become: true
+  ansible.builtin.copy:
+    src: "{{ penpot_host_castore_location }}"
+    dest: "{{ penpot_bind_castore_location }}"
+    remote_src: true
+    mode: '0644'
+    owner: root
+    group: root

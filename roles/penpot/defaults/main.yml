@@ -1,0 +1,228 @@
+---
+# defaults file for penpot
+
+# version information
+penpot_version: "2.16"
+
+penpot_domain: ""
+penpot_url: "https://{{ penpot_domain }}"
+
+# values for the secrets
+penpot_secretkey: ""
+
+##
+# database settings (only postgres is supported)
+##
+penpot_db: true
+penpot_db_host: "host.containers.internal"
+penpot_db_name: "{{ penpot_service_prefix }}"
+penpot_db_owner: "{{ penpot_service_prefix }}_admin"
+penpot_db_user: "{{ penpot_service_prefix }}_app"
+penpot_db_pw: ""
+penpot_db_remote: "{{ (penpot_db_host != 'localhost') }}"
+
+##
+# Valkey settings
+##
+penpot_redis_uri: "redis://{{ penpot_valkey_service }}/0"
+
+##
+# SMTP settings
+##
+penpot_smtp: false
+penpot_smtp_default_from: "no-reply@{{ penpot_domain }}"
+penpot_smtp_default_reply_to: "{{ penpot_smtp_default_from }}"
+penpot_smtp_host: "localhost"
+penpot_smtp_port: 25
+penpot_smtp_user: "{{ penpot_service_prefix }}"
+penpot_smtp_pw: ""
+penpot_smtp_tls: false
+penpot_smtp_ssl: false
+
+##
+# Penpot Customisation
+##
+
+# HTTP settings
+penpot_http_max_body_size: 367001600
+
+# default flags
+penpot_default_flags:
+  - disable-email-verification
+  - enable-smtp
+  - enable-prepl-server
+  - disable-secure-session-cookies
+
+# Telemetry
+penpot_telemetry_enabled: false
+penpot_telemetry_referer: "fossgalaxy-ansible"
+
+# we don't support deploying the mcp right now...
+#penpot_mcp: false
+#penpot_mcp_version: "{{ penpot_version }}"
+#penpot_mcp_image: "docker.io/penpotapp/mcp:{{ penpot_mcp_version }}"
+
+# Integration: OpenID
+penpot_oid_meta_url: ""
+penpot_oid: "{{ penpot_oid_meta_url | length > 0 }}"
+penpot_oid_client: "{{ penpot_service_prefix }}"
+penpot_oid_register: "{{ penpot_register_force_external }}"
+penpot_oid_displayname: "OpenID"
+
+penpot_keycloak: "{{ penpot_oid and penpot_oid_secret is not defined }}" # should we use the self-hosted role to configure keycloak?
+penpot_keycloak_realm: "freeipa"
+
+penpot_oid_provider_name: "{{ penpot_keycloak_realm }}"
+
+##
+# container options
+##
+
+# engine selection
+penpot_container_engine: podman
+
+# penpot generates a lot of unit files, put them in their own dir...
+penpot_quadlet_dir: "/etc/containers/systemd/{{ penpot_service_prefix }}"
+
+# Defaults for containers
+penpot_service_prefix: penpot # multi-container: (not one service..)
+penpot_quadlet_wanted_by: multi-user.target
+
+# volume names
+penpot_volume_assets: "{{ penpot_service_prefix }}_assets"
+
+# secret names
+penpot_secret_secretkey: "{{ penpot_service_prefix }}_secretkey"
+penpot_secret_db_password: "{{ penpot_service_prefix }}_db_pass"
+penpot_secret_smtp_password: "{{ penpot_service_prefix }}_smtp_pass"
+penpot_secret_oid_password: "{{ penpot_service_prefix }}_oidc_pass"
+
+# user ids
+penpot_uid: 1000
+penpot_gid: 1000
+
+# reverse proxy: traefik
+penpot_traefik: true
+penpot_traefik_labels: >-
+  {{
+    (
+      {'traefik.enable': 'true'}
+    ) | combine(
+          (penpot_traefik | default(true) | bool)
+          | ternary(
+              ([
+                {
+                  'key': 'traefik.http.routers.' ~ penpot_service_prefix ~ '.rule',
+                  'value': 'Host(`' ~ penpot_domain ~ '`)'
+                },
+                {
+                  'key': 'traefik.http.services.' ~ penpot_service_prefix ~ '.loadbalancer.server.port',
+                  'value': '8080'
+                }
+              ] | ansible.builtin.items2dict),
+              {}
+          )
+      )
+  }}
+
+# directory for stuff we'll need to bind
+penpot_bind_dir: "{{ podman_bind_dir | default('/srv/podman/') }}/penpot"
+
+# FreeIPA trust
+penpot_inject_cert: false
+
+# this is the host version from the FreeIPA enrolled host, which *should* trust our ca...
+penpot_host_castore_location: /etc/pki/ca-trust/extracted/java/cacerts
+penpot_bind_castore_location: "{{ penpot_bind_dir }}/cacerts"
+
+penpot_app_cert_dir: /opt/jre/lib/security/
+penpot_app_cert_castore: "{{ penpot_app_cert_dir }}cacerts"
+
+# Extra environment hook
+penpot_extra_env: {}
+penpot_extra_labels: {}
+penpot_extra_volumes: []
+penpot_extra_secrets: []
+penpot_extra_quadlet_options: []
+penpot_extra_ports: []
+
+##
+# Penpot network
+##
+
+penpot_network: "{{ penpot_service_prefix }}"
+penpot_network_internal: false
+
+##
+# Container: Valkey
+# note: I'm not sure I like this approach - it feels a little brittle
+##
+
+penpot_valkey_service: "{{ penpot_service_prefix }}-valkey"
+
+##
+# Container: Frontend
+##
+
+# Image name
+penpot_fe_version: "{{ penpot_version }}"
+penpot_fe_image: "docker.io/penpotapp/frontend:{{ penpot_fe_version }}"
+
+# service name
+penpot_fe_service: "{{ penpot_service_prefix }}-frontend"
+
+# What should trigger us?
+penpot_fe_quadlet_wanted_by: "{{ penpot_quadlet_wanted_by }}"
+
+# container spesific overrides
+penpot_fe_extra_env: "{{ penpot_extra_env }}"
+penpot_fe_extra_labels: "{{ penpot_extra_labels }}"
+penpot_fe_extra_volumes: "{{ penpot_extra_volumes }}"
+penpot_fe_extra_secrets: "{{ penpot_extra_secrets }}"
+penpot_fe_extra_quadlet_options: "{{ penpot_extra_quadlet_options }}"
+penpot_fe_extra_ports: "{{ penpot_extra_ports }}"
+
+##
+# Container: Backend
+##
+
+# image name
+penpot_be_version: "{{ penpot_version }}"
+penpot_be_image: "docker.io/penpotapp/backend:{{ penpot_be_version }}"
+
+# service name
+penpot_be_service: "{{ penpot_service_prefix }}-backend"
+
+# what should trigger us?
+penpot_be_quadlet_wanted_by: "{{ penpot_quadlet_wanted_by }}"
+penbot_be_allowed_hosts: []
+
+# container spesific overrides
+penpot_be_extra_env: "{{ penpot_extra_env }}"
+penpot_be_extra_labels: "{{ penpot_extra_labels }}"
+penpot_be_extra_volumes: "{{ penpot_extra_volumes }}"
+penpot_be_extra_secrets: "{{ penpot_extra_secrets }}"
+penpot_be_extra_quadlet_options: "{{ penpot_extra_quadlet_options }}"
+penpot_be_extra_ports: "{{ penpot_extra_ports }}"
+
+##
+# Container: Exporter
+##
+
+# image name
+penpot_exporter_version: "{{ penpot_version }}"
+penpot_exporter_image: "docker.io/penpotapp/exporter:{{ penpot_exporter_version }}"
+
+# service name
+penpot_exporter_service: "{{ penpot_service_prefix }}-exporter"
+
+# what should trigger us?
+penpot_exporter_quadlet_wanted_by: "{{ penpot_quadlet_wanted_by }}"
+
+# container spesific overrides
+penpot_exporter_extra_env: "{{ penpot_extra_env }}"
+penpot_exporter_extra_labels: "{{ penpot_extra_labels }}"
+penpot_exporter_extra_volumes: "{{ penpot_extra_volumes }}"
+penpot_exporter_extra_secrets: "{{ penpot_extra_secrets }}"
+penpot_exporter_extra_quadlet_options: "{{ penpot_extra_quadlet_options }}"
+penpot_exporter_extra_ports: "{{ penpot_extra_ports }}"
