@@ -35,7 +35,7 @@
 
 - name: Ensure the configuration exists
   ansible.builtin.template:
-    src: "runner-config.yml"
+    src: "runner-config.yml.j2"
     dest: "{{ forgejo_runner_config_path }}"
     owner: "{{ forgejo_runner_user }}"
     mode: '0600'
