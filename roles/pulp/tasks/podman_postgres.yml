@@ -32,4 +32,35 @@
     name: "{{ pulp_secret_db_password }}"
     data: "{{ pulp_db_pw }}"
   notify:
-    - Restart Pulp
+     - Reload Pulp API
+     - Reload Pulp Content
+     - Reload Pulp Worker
+
+- name: Ensure secret for database encyption exists
+  become: true
+  no_log: true
+  containers.podman.podman_secret:
+    state: present
+    name: "{{ pulp_secret_db_enckey }}"
+    data: "{{ pulp_encyption_key }}"
+  notify:
+     - Reload Pulp API
+     - Reload Pulp Content
+     - Reload Pulp Worker
+
+- name: Run database migrations
+  become: true
+  containers.podman.podman_container:
+    name: "{{ pulp_migration_service }}"
+    rm: true
+    detach: false
+    image: "{{ pulp_api_image }}"
+    network: "{{ pulp_network }}.network"
+    state: quadlet
+    env: "{{ pulp_django_env | combine(pulp_api_extra_env) }}"
+    secrets: "{{ pulp_django_secrets + pulp_api_extra_secrets }}"
+    volumes: "{{ pulp_django_volumes + pulp_api_extra_volumes }}"
+    command:
+      - pulpcore-manager
+      - migrate
+      - --noinput

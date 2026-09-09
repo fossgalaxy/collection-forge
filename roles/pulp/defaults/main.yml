@@ -49,28 +49,8 @@ pulp_uid: 700
 pulp_gid: 700
 
 # reverse proxy: traefik
-pulp_traefik: true
-pulp_traefik_labels: >-
-  {{
-    (
-      {'traefik.enable': 'true'}
-    ) | combine(
-          (pulp_traefik | default(true) | bool)
-          | ternary(
-              ([
-                {
-                  'key': 'traefik.http.routers.' ~ pulp_service_prefix ~ '.rule',
-                  'value': 'Host(`' ~ pulp_domain ~ '`)'
-                },
-                {
-                  'key': 'traefik.http.services.' ~ pulp_service_prefix ~ '.loadbalancer.server.port',
-                  'value': '8080'
-                }
-              ] | ansible.builtin.items2dict),
-              {}
-          )
-      )
-  }}
+pulp_api_traefik: false # DO NOT USE: EXPERIMENTAL/UNTESTED
+pulp_traefik: "{{ not pulp_api_traefik }}"
 
 # Extra environment hook
 pulp_extra_env: {}
@@ -87,6 +67,9 @@ pulp_extra_ports: []
 pulp_secret_secretkey: "{{ pulp_service_prefix }}_secretkey"
 pulp_secret_db_password: "{{ pulp_service_prefix }}_db_pass"
 pulp_secret_db_enckey: "{{ pulp_service_prefix }}_db_key"
+
+# ephermial containers
+pulp_migration_service: "{{ pulp_service_prefix }}-migrate"
 
 ##
 # Container volumes
@@ -108,17 +91,26 @@ pulp_network_internal: false
 
 ##
 # Container: web
+# This is really an nginx container we sit infront of... long term
+# we might be able to get the traefik rules to make this obsolute...
 ##
+
+pulp_web_enabled: "{{ not pulp_api_traefik }}"
 
 # image name
 pulp_web_version: "{{ pulp_version }}"
-pulp_web_image: "pulp/pulp-minimal:{{ pulp_api_version }}"
+pulp_web_image: "docker.io/pulp/pulp-web:{{ pulp_web_version }}"
 
 # service name
-pulp_web_service: "{{ pulp_service_prefix }}-api"
+pulp_web_service: "{{ pulp_service_prefix }}-web"
 
 # what should trigger us?
 pulp_web_quadlet_wanted_by: "{{ pulp_quadlet_wanted_by }}"
+
+# nginx binds...
+pulp_bind_nginx: "{{ pulp_binddir }}/nginx/"
+pulp_web_bind_sh: "{{ pulp_bind_nginx }}nginx.sh"
+pulp_web_bind_conf: "{{ pulp_bind_nginx }}nginx.conf.template"
 
 # container spesific overrides
 pulp_web_extra_env: "{{ pulp_extra_env }}"
@@ -127,6 +119,28 @@ pulp_web_extra_volumes: "{{ pulp_extra_volumes }}"
 pulp_web_extra_secrets: "{{ pulp_extra_secrets }}"
 pulp_web_extra_quadlet_options: "{{ pulp_extra_quadlet_options }}"
 pulp_web_extra_ports: "{{ pulp_extra_ports }}"
+
+pulp_web_traefik_labels: >-
+  {{
+    (
+      {'traefik.enable': 'true'}
+    ) | combine(
+          (pulp_traefik | default(true) | bool)
+          | ternary(
+              ([
+                {
+                  'key': 'traefik.http.routers.' ~ pulp_service_prefix ~ '.rule',
+                  'value': 'Host(`' ~ pulp_domain ~ '`)'
+                },
+                {
+                  'key': 'traefik.http.services.' ~ pulp_service_prefix ~ '.loadbalancer.server.port',
+                  'value': '8080'
+                }
+              ] | ansible.builtin.items2dict),
+              {}
+          )
+      )
+  }}
 
 ##
 # Container: api
@@ -150,6 +164,29 @@ pulp_api_extra_secrets: "{{ pulp_extra_secrets }}"
 pulp_api_extra_quadlet_options: "{{ pulp_extra_quadlet_options }}"
 pulp_api_extra_ports: "{{ pulp_extra_ports }}"
 
+# do not use (yet!)
+pulp_api_traefik_labels: >-
+  {{
+    (
+      {'traefik.enable': 'true'}
+    ) | combine(
+          (pulp_api_traefik | default(false) | bool)
+          | ternary(
+              ([
+                {
+                  'key': 'traefik.http.routers.' ~ pulp_api_service ~ '.rule',
+                  'value': 'Host(`' ~ pulp_domain ~ '`)'
+                },
+                {
+                  'key': 'traefik.http.services.' ~ pulp_api_service ~ '.loadbalancer.server.port',
+                  'value': '24817'
+                }
+              ] | ansible.builtin.items2dict),
+              {}
+          )
+      )
+  }}
+
 ##
 # Container: content
 ##
@@ -171,6 +208,29 @@ pulp_content_extra_volumes: "{{ pulp_extra_volumes }}"
 pulp_content_extra_secrets: "{{ pulp_extra_secrets }}"
 pulp_content_extra_quadlet_options: "{{ pulp_extra_quadlet_options }}"
 pulp_content_extra_ports: "{{ pulp_extra_ports }}"
+
+# do not use (yet!)
+pulp_content_traefik_labels: >-
+  {{
+    (
+      {'traefik.enable': 'true'}
+    ) | combine(
+          (pulp_api_traefik | default(false) | bool)
+          | ternary(
+              ([
+                {
+                  'key': 'traefik.http.routers.' ~ pulp_content_service ~ '.rule',
+                  'value': 'Host(`' ~ pulp_domain ~ '`) && PathPrefix(\'/pulp/content/\')'
+                },
+                {
+                  'key': 'traefik.http.services.' ~ pulp_content_service ~ '.loadbalancer.server.port',
+                  'value': '24816'
+                }
+              ] | ansible.builtin.items2dict),
+              {}
+          )
+      )
+  }}
 
 ##
 # Container: worker

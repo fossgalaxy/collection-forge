@@ -1,18 +1,23 @@
 # vim: set syntax=python:
-SECRET_KEY = "{{ pulp_secret_key }}"
+
+SECRET_KEY = "{{ pulp_secretkey }}" #FIXME: use secret
+
 CONTENT_ORIGIN = "http://{{ pulp_content_service }}:24816"
 DATABASES = {
     "default": {
-        "HOST": "postgres", 
+        "HOST": "{{ pulp_db_host }}", 
         "ENGINE": "django.db.backends.postgresql", 
         "NAME": "{{ pulp_db_name }}", 
         "USER": "{{ pulp_db_user }}", 
-        "PASSWORD": "{{ pulp_db_pass }}", 
+        "PASSWORD": "{{ pulp_db_pw }}", # FIXME: use secret
         "PORT": "5432", 
         "CONN_MAX_AGE": 0, 
         "OPTIONS": {"sslmode": "prefer"}
     }
 }
+
+DB_ENCRYPTION_KEY = "/run/secrets/{{ pulp_secret_db_enckey }}"
+
 CACHE_ENABLED = True
 REDIS_HOST = "{{ pulp_cache_service }}"
 REDIS_PORT = {{ pulp_cache_port | default(6379) | int }}

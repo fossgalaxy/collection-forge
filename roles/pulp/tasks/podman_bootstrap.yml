@@ -21,6 +21,7 @@
   become: true
   containers.podman.podman_container:
     name: "{{ pulp_migration_service }}"
+    detach: true
     rm: true
     image: "{{ pulp_api_image }}"
     network: "{{ pulp_network }}.network"

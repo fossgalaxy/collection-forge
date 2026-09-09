@@ -10,22 +10,26 @@ pulp_django_volumes: >-
     [
       pulp_bind_settingsfile ~ ":/etc/pulp/settings.py:ro,z",
       pulp_bind_certs ~ ":/etc/pulp/certs:z",
-      pulp_volume_content ~ ".volume:/var/lib/pulp"
+      pulp_volume_data ~ ".volume:/var/lib/pulp"
     ]
   }}
 
 pulp_django_secrets: >-
   {{
     ((pulp_db | bool) | ternary(
-      [ pulp_secret_db_password ~ ',type=env,target=PULP_DATABASE_PASSWORD' ], []
-      [ pulp_secret_db_enckey ~ ',type=env,target=PULP_DATABASE_KEY' ], []
+      [
+        pulp_secret_db_password ~ ',type=env,target=PULP_DATABASE_PASSWORD',
+        pulp_secret_db_enckey
+      ], []
     )) +
     [
       pulp_secret_secretkey ~ ',type=env,target=PULP_SECRET_KEY'
     ]
   }}
 
-pulp_django_options:
+pulp_django_quadlet_wanted_by: "{{ pulp_quadlet_wanted_by }}"
+
+pulp_django_quadlet_options:
   - |
     [Unit]
     Wants={{ pulp_cache_service }}.container
@@ -33,4 +37,35 @@ pulp_django_options:
     Requires={{ pulp_cache_service }}.container
     [Install]
     WantedBy={{ pulp_django_quadlet_wanted_by }}
+
+# nginx proxy to proxy setup
+pulp_web_env: {}
+
+pulp_web_volumes: >-
+  {{
+    [
+      pulp_web_bind_sh ~ ":/usr/bin/nginx.sh:ro,Z",
+      pulp_web_bind_conf ~ ":/etc/nginx/nginx.conf.template:Z",
+    ]
+  }}
+
+pulp_web_labels: >-
+  {{
+    (pulp_traefik | bool)
+    | ternary(pulp_web_traefik_labels, {})
+  }}
+
+pulp_web_quadlet_wanted_by: "{{ pulp_quadlet_wanted_by }}"
+
+pulp_web_quadlet_options:
+  - |
+    [Unit]
+    Wants={{ pulp_api_service }}.container
+    After={{ pulp_api_service }}.container
+    Requires={{ pulp_api_service }}.container
+    Wants={{ pulp_content_service }}.container
+    After={{ pulp_content_service }}.container
+    Requires={{ pulp_content_service }}.container
+    [Install]
+    WantedBy={{ pulp_web_quadlet_wanted_by }}
 

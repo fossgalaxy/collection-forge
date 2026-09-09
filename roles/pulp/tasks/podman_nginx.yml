@@ -1,0 +1,51 @@
+---
+# Setup the compose-style reverse proxy
+# note: I don't like back-to-back reverse proxies like this
+# for now, it's the easist route, ideally traefik should be doing this...
+
+- name: Ensure bind directory exists
+  become: true
+  ansible.builtin.file:
+    path: "{{ pulp_bind_nginx }}"
+    state: directory
+    mode: '0500'
+    owner: "{{ pulp_uid }}"
+    group: "{{ pulp_gid }}"
+    setype: container_file_t
+
+- name: Ensure nginx builder exists
+  become: true
+  ansible.builtin.copy:
+    src: nginx.sh
+    dest: "{{ pulp_web_bind_sh }}"
+    owner: "{{ pulp_uid }}"
+    group: "{{ pulp_gid }}"
+    mode: '0500'
+    setype: container_file_t
+
+- name: Ensure nginx template exists
+  become: true
+  ansible.builtin.copy:
+    src: nginx.conf.template
+    dest: "{{ pulp_web_bind_conf }}"
+    owner: "{{ pulp_uid }}"
+    group: "{{ pulp_gid }}"
+    mode: '0400'
+    setype: container_file_t
+
+- name: Ensure web container exists
+  become: true
+  containers.podman.podman_container:
+    name: "{{ pulp_web_service }}"
+    image: "{{ pulp_web_image }}"
+    command: [ "/usr/bin/nginx.sh" ]
+    network: "{{ pulp_network }}.network"
+    state: quadlet
+    quadlet_dir: "{{ pulp_quadlet_dir }}"
+    env: "{{ pulp_web_env | combine(pulp_web_extra_env) }}"
+    volumes: "{{ pulp_web_volumes + pulp_web_extra_volumes }}"
+    label: "{{ pulp_web_labels | combine(pulp_web_extra_labels) }}"
+    quadlet_options: "{{ pulp_web_quadlet_options + pulp_web_extra_quadlet_options }}"
+  notify:
+    - Reload Pulp Web
+
