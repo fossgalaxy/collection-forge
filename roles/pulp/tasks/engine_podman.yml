@@ -29,6 +29,10 @@
     group: "{{ pulp_gid }}"
     mode: '0400'
     setype: container_file_t
+  notify:
+     - Reload Pulp API
+     - Reload Pulp Content
+     - Reload Pulp Worker
 
 - name: Ensure data volume exists
   become: true
@@ -75,6 +79,9 @@
 - name: Ensure podman database is setup
   ansible.builtin.include_tasks: "podman_postgres.yml"
   when: pulp_db | bool
+
+- name: Bootstrap service
+  ansible.builtin.include_tasks: "podman_bootstrap.yml"
 
 - name: Ensure valkey container exists
   no_log: true

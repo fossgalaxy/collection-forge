@@ -3,36 +3,38 @@
 # Run bootstrap setup
 ##
 
-- name: Ensure podman database is setup
-  ansible.builtin.include_tasks: "podman_postgres.yml"
-  when: pulp_db | bool
-
-- name: Ensure quadlet directory exists
-  become: true
-  ansible.builtin.file:
-    path: "{{ pulp_quadlet_dir }}"
-    state: directory
-    mode: '0600'
-    owner: root
-    group: root
-  when: pulp_quadlet_dir != "/etc/containers/systemd/"
-
-- name: Run database migrations
+- name: Ensure admin account has been bootstrapped
   become: true
   containers.podman.podman_container:
-    name: "{{ pulp_migration_service }}"
-    detach: true
+    name: "{{ pulp_bootstrap_service }}"
+    detach: false
     rm: true
     image: "{{ pulp_api_image }}"
-    network: "{{ pulp_network }}.network"
-    state: quadlet
-    env: "{{ pulp_django_env | combine(pulp_api_extra_env) }}"
+    network: "{{ pulp_network }}"
+    env: "{{ pulp_django_env | combine(pulp_api_extra_env) | combine(pulp_bootstrap_env) }}"
     secrets: "{{ pulp_django_secrets + pulp_api_extra_secrets }}"
-    volumes: "{{ pulp_django_volumes + pulp_api_extra_volumes }}"
-    command:
-      - pulpcore-manager
-      - migrate
-      - --noinput
+    volumes: "{{ pulp_oneshot_volumes + pulp_api_extra_volumes }}"
+    command: [ "set_init_password.sh" ]
+  when: pulp_admin_password is defined
 
 # TODO we need to handle the signing service
 # see https://github.com/pulp/pulp-oci-images/blob/latest/images/assets/add_signing_service.sh
+- name: Generate certs for token service
+  become: true
+  block:
+    - name: Ensure private key exists
+      community.crypto.openssl_privatekey:
+        path: "{{ pulp_token_privatekey }}"
+        type: ECC
+        curve: secp256r1
+        owner: "{{ pulp_uid }}"
+        mode: "0600"
+
+    - name: Ensure public key exists
+      community.crypto.openssl_publickey:
+        path: "{{ pulp_token_publickey }}"
+        privatekey_path: "{{ pulp_token_privatekey }}"
+        format: PEM
+        owner: "{{ pulp_uid }}"
+        mode: "0644"
+  when: pulp_token_gencerts | bool

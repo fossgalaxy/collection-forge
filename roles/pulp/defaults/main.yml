@@ -11,6 +11,18 @@ pulp_url: "https://{{ pulp_domain }}"
 pulp_secretkey: ""
 pulp_encyption_key: "DNmNdwgyZugTax9S64J0FITTr9IHPxbuoF1F1CGPr68=" # default from pulp repo
 
+#pulp_admin_password: "password"
+
+# feature: token server
+pulp_tokens: true
+pulp_token_gencerts: true
+pulp_token_url: "{{ pulp_url }}/token/"
+pulp_token_algorithm: "ES256"
+pulp_token_lifetime: 300 # seconds
+
+pulp_token_privatekey: "{{ pulp_bind_certs }}/container_auth_private_key.pem"
+pulp_token_publickey: "{{ pulp_bind_certs }}/container_auth_public_key.pem"
+
 ##
 # database settings (only postgres is supported)
 ##
@@ -70,6 +82,7 @@ pulp_secret_db_enckey: "{{ pulp_service_prefix }}_db_key"
 
 # ephermial containers
 pulp_migration_service: "{{ pulp_service_prefix }}-migrate"
+pulp_bootstrap_service: "{{ pulp_service_prefix }}-bootstrap"
 
 ##
 # Container volumes

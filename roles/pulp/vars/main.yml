@@ -14,6 +14,14 @@ pulp_django_volumes: >-
     ]
   }}
 
+pulp_oneshot_volumes: >-
+  {{
+    [
+      pulp_bind_settingsfile ~ ":/etc/pulp/settings.py:ro,z",
+      pulp_bind_certs ~ ":/etc/pulp/certs:z"
+    ]
+  }}
+
 pulp_django_secrets: >-
   {{
     ((pulp_db | bool) | ternary(
@@ -69,3 +77,6 @@ pulp_web_quadlet_options:
     [Install]
     WantedBy={{ pulp_web_quadlet_wanted_by }}
 
+# bootstrap extras
+pulp_bootstrap_env:
+  PULP_DEFAULT_ADMIN_PASSWORD: "{{ pulp_admin_password | default('') }}"

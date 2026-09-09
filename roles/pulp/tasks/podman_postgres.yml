@@ -55,11 +55,10 @@
     rm: true
     detach: false
     image: "{{ pulp_api_image }}"
-    network: "{{ pulp_network }}.network"
-    state: quadlet
+    network: "{{ pulp_network }}"
     env: "{{ pulp_django_env | combine(pulp_api_extra_env) }}"
     secrets: "{{ pulp_django_secrets + pulp_api_extra_secrets }}"
-    volumes: "{{ pulp_django_volumes + pulp_api_extra_volumes }}"
+    volumes: "{{ pulp_oneshot_volumes + pulp_api_extra_volumes }}"
     command:
       - pulpcore-manager
       - migrate
