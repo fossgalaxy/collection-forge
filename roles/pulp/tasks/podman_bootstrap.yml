@@ -1,0 +1,37 @@
+---
+##
+# Run bootstrap setup
+##
+
+- name: Ensure podman database is setup
+  ansible.builtin.include_tasks: "podman_postgres.yml"
+  when: pulp_db | bool
+
+- name: Ensure quadlet directory exists
+  become: true
+  ansible.builtin.file:
+    path: "{{ pulp_quadlet_dir }}"
+    state: directory
+    mode: '0600'
+    owner: root
+    group: root
+  when: pulp_quadlet_dir != "/etc/containers/systemd/"
+
+- name: Run database migrations
+  become: true
+  containers.podman.podman_container:
+    name: "{{ pulp_migration_service }}"
+    rm: true
+    image: "{{ pulp_api_image }}"
+    network: "{{ pulp_network }}.network"
+    state: quadlet
+    env: "{{ pulp_django_env | combine(pulp_api_extra_env) }}"
+    secrets: "{{ pulp_django_secrets + pulp_api_extra_secrets }}"
+    volumes: "{{ pulp_django_volumes + pulp_api_extra_volumes }}"
+    command:
+      - pulpcore-manager
+      - migrate
+      - --noinput
+
+# TODO we need to handle the signing service
+# see https://github.com/pulp/pulp-oci-images/blob/latest/images/assets/add_signing_service.sh

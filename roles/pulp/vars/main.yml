@@ -1,0 +1,36 @@
+---
+# vars file for pulp
+
+# a lot of pulp is a single django app with multiple entrypoints, we can save time by defining once then reusing
+
+pulp_django_env: {}
+
+pulp_django_volumes: >-
+  {{
+    [
+      pulp_bind_settingsfile ~ ":/etc/pulp/settings.py:ro,z",
+      pulp_bind_certs ~ ":/etc/pulp/certs:z",
+      pulp_volume_content ~ ".volume:/var/lib/pulp"
+    ]
+  }}
+
+pulp_django_secrets: >-
+  {{
+    ((pulp_db | bool) | ternary(
+      [ pulp_secret_db_password ~ ',type=env,target=PULP_DATABASE_PASSWORD' ], []
+      [ pulp_secret_db_enckey ~ ',type=env,target=PULP_DATABASE_KEY' ], []
+    )) +
+    [
+      pulp_secret_secretkey ~ ',type=env,target=PULP_SECRET_KEY'
+    ]
+  }}
+
+pulp_django_options:
+  - |
+    [Unit]
+    Wants={{ pulp_cache_service }}.container
+    After={{ pulp_cache_service }}.container
+    Requires={{ pulp_cache_service }}.container
+    [Install]
+    WantedBy={{ pulp_django_quadlet_wanted_by }}
+

@@ -1,0 +1,195 @@
+---
+# defaults file for pulp
+
+# version information
+pulp_version: "stable"
+
+pulp_domain: ""
+pulp_url: "https://{{ pulp_domain }}"
+
+# configuration settings
+pulp_secretkey: ""
+pulp_encyption_key: "DNmNdwgyZugTax9S64J0FITTr9IHPxbuoF1F1CGPr68=" # default from pulp repo
+
+##
+# database settings (only postgres is supported)
+##
+pulp_db: true
+pulp_db_host: "host.containers.internal"
+pulp_db_name: "{{ pulp_service_prefix }}"
+pulp_db_owner: "{{ pulp_service_prefix }}_admin"
+pulp_db_user: "{{ pulp_service_prefix }}_app"
+pulp_db_pw: ""
+pulp_db_remote: "{{ (pulp_db_host != 'localhost') }}"
+
+##
+# cache settings
+##
+
+pulp_cache: true
+pulp_cache_service: "{{ pulp_service_prefix }}-valkey"
+# pulp_cache_password:
+
+##
+# container options
+##
+
+# engine selection
+pulp_container_engine: podman
+
+# pulp generates a lot of unit files, put them in their own dir...
+pulp_quadlet_dir: "/etc/containers/systemd/{{ pulp_service_prefix }}"
+
+# Defaults for containers
+pulp_service_prefix: "pulp" # multi-container: (not one service..)
+pulp_quadlet_wanted_by: multi-user.target
+
+# user ids
+pulp_uid: 700
+pulp_gid: 700
+
+# reverse proxy: traefik
+pulp_traefik: true
+pulp_traefik_labels: >-
+  {{
+    (
+      {'traefik.enable': 'true'}
+    ) | combine(
+          (pulp_traefik | default(true) | bool)
+          | ternary(
+              ([
+                {
+                  'key': 'traefik.http.routers.' ~ pulp_service_prefix ~ '.rule',
+                  'value': 'Host(`' ~ pulp_domain ~ '`)'
+                },
+                {
+                  'key': 'traefik.http.services.' ~ pulp_service_prefix ~ '.loadbalancer.server.port',
+                  'value': '8080'
+                }
+              ] | ansible.builtin.items2dict),
+              {}
+          )
+      )
+  }}
+
+# Extra environment hook
+pulp_extra_env: {}
+pulp_extra_labels: {}
+pulp_extra_volumes: []
+pulp_extra_secrets: []
+pulp_extra_quadlet_options: []
+pulp_extra_ports: []
+
+##
+# secret names
+##
+
+pulp_secret_secretkey: "{{ pulp_service_prefix }}_secretkey"
+pulp_secret_db_password: "{{ pulp_service_prefix }}_db_pass"
+pulp_secret_db_enckey: "{{ pulp_service_prefix }}_db_key"
+
+##
+# Container volumes
+##
+
+pulp_binddir: "/srv/podman/{{ pulp_service_prefix }}"
+pulp_bind_settingsfile: "{{ pulp_binddir }}/settings.py"
+
+pulp_bind_certs: "{{ pulp_binddir }}/certs/"
+
+pulp_volume_data: "{{ pulp_service_prefix }}_data"
+
+##
+# Container network
+##
+
+pulp_network: "{{ pulp_service_prefix }}"
+pulp_network_internal: false
+
+##
+# Container: web
+##
+
+# image name
+pulp_web_version: "{{ pulp_version }}"
+pulp_web_image: "pulp/pulp-minimal:{{ pulp_api_version }}"
+
+# service name
+pulp_web_service: "{{ pulp_service_prefix }}-api"
+
+# what should trigger us?
+pulp_web_quadlet_wanted_by: "{{ pulp_quadlet_wanted_by }}"
+
+# container spesific overrides
+pulp_web_extra_env: "{{ pulp_extra_env }}"
+pulp_web_extra_labels: "{{ pulp_extra_labels }}"
+pulp_web_extra_volumes: "{{ pulp_extra_volumes }}"
+pulp_web_extra_secrets: "{{ pulp_extra_secrets }}"
+pulp_web_extra_quadlet_options: "{{ pulp_extra_quadlet_options }}"
+pulp_web_extra_ports: "{{ pulp_extra_ports }}"
+
+##
+# Container: api
+##
+
+# image name
+pulp_api_version: "{{ pulp_version }}"
+pulp_api_image: "pulp/pulp-minimal:{{ pulp_api_version }}"
+
+# service name
+pulp_api_service: "{{ pulp_service_prefix }}-api"
+
+# what should trigger us?
+pulp_api_quadlet_wanted_by: "{{ pulp_quadlet_wanted_by }}"
+
+# container spesific overrides
+pulp_api_extra_env: "{{ pulp_extra_env }}"
+pulp_api_extra_labels: "{{ pulp_extra_labels }}"
+pulp_api_extra_volumes: "{{ pulp_extra_volumes }}"
+pulp_api_extra_secrets: "{{ pulp_extra_secrets }}"
+pulp_api_extra_quadlet_options: "{{ pulp_extra_quadlet_options }}"
+pulp_api_extra_ports: "{{ pulp_extra_ports }}"
+
+##
+# Container: content
+##
+
+# image name
+pulp_content_version: "{{ pulp_version }}"
+pulp_content_image: "docker.io/pulp/pulp-minimal:{{ pulp_content_version }}"
+
+# service name
+pulp_content_service: "{{ pulp_service_prefix }}-content"
+
+# what should trigger us?
+pulp_content_quadlet_wanted_by: "{{ pulp_quadlet_wanted_by }}"
+
+# container spesific overrides
+pulp_content_extra_env: "{{ pulp_extra_env }}"
+pulp_content_extra_labels: "{{ pulp_extra_labels }}"
+pulp_content_extra_volumes: "{{ pulp_extra_volumes }}"
+pulp_content_extra_secrets: "{{ pulp_extra_secrets }}"
+pulp_content_extra_quadlet_options: "{{ pulp_extra_quadlet_options }}"
+pulp_content_extra_ports: "{{ pulp_extra_ports }}"
+
+##
+# Container: worker
+##
+
+# image name
+pulp_worker_version: "{{ pulp_version }}"
+pulp_worker_image: "docker.io/pulp/pulp-minimal:{{ pulp_content_version }}"
+
+# service name
+pulp_worker_service: "{{ pulp_service_prefix }}-worker"
+
+# what should trigger us?
+pulp_worker_quadlet_wanted_by: "{{ pulp_worker_wanted_by }}"
+
+# container spesific overrides
+pulp_worker_extra_env: "{{ pulp_extra_env }}"
+pulp_worker_extra_labels: "{{ pulp_extra_labels }}"
+pulp_worker_extra_volumes: "{{ pulp_extra_volumes }}"
+pulp_worker_extra_secrets: "{{ pulp_extra_secrets }}"
+pulp_worker_extra_quadlet_options: "{{ pulp_extra_quadlet_options }}"
+pulp_worker_extra_ports: "{{ pulp_extra_ports }}"

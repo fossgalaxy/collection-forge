@@ -1,0 +1,35 @@
+---
+
+- name: Validate db vars
+  ansible.builtin.assert:
+    that:
+      - pulp_db_host is string and pulp_db_host | length > 0
+      - pulp_db_name is string and pulp_db_name | length > 0
+      - pulp_db_owner is string and pulp_db_owner | length > 0
+      - pulp_db_user is string and pulp_db_user | length > 0
+      - pulp_db_pw is string and pulp_db_pw | length > 0
+
+- name: Ensure DB exists
+  no_log: true
+  ansible.builtin.include_role:
+    name: "fossgalaxy.infra.postgres_db"
+    tasks_from: "ensure_db.yml"
+  vars:
+    pg_host: "{{ pulp_db_host }}"
+    pg_db: "{{ pulp_db_name }}"
+    pg_owner: "{{ pulp_db_owner }}"
+    pg_app_user: "{{ pulp_db_user }}"
+    pg_app_password: "{{ pulp_db_pw }}"
+    pg_app_inherits_owner: true
+    pg_remote: "{{ pulp_db_remote }}"
+  when: pulp_db | bool
+
+- name: Ensure secret for database password exists
+  become: true
+  no_log: true
+  containers.podman.podman_secret:
+    state: present
+    name: "{{ pulp_secret_db_password }}"
+    data: "{{ pulp_db_pw }}"
+  notify:
+    - Restart Pulp

@@ -1,0 +1,134 @@
+---
+
+- name: Ensure podman database is setup
+  ansible.builtin.include_tasks: "podman_postgres.yml"
+  when: pulp_db | bool
+
+- name: Ensure bind directory exists
+  become: true
+  ansible.builtin.file:
+    path: "{{ pulp_binddir }}"
+    state: directory
+    mode: '0500'
+    owner: "{{ pulp_uid }}"
+    group: "{{ pulp_gid }}"
+    setype: container_file_t
+
+- name: Ensure cert directory exists
+  become: true
+  ansible.builtin.file:
+    path: "{{ pulp_bind_certs }}"
+    state: directory
+    mode: '0500'
+    owner: "{{ pulp_uid }}"
+    group: "{{ pulp_gid }}"
+    setype: container_file_t
+
+- name: Ensure settings file exists
+  become: true
+  ansible.builtin.template:
+    src: "settings.py.j2"
+    dest: "{{ pulp_bind_settingsfile }}"
+    owner: "{{ pulp_uid }}"
+    group: "{{ pulp_gid }}"
+    mode: '0400'
+    setype: container_file_t
+
+- name: Ensure data volume exists
+  become: true
+  containers.podman.podman_volume:
+    name: "{{ pulp_volume_data }}"
+    state: quadlet
+    quadlet_dir: "{{ pulp_quadlet_dir }}"
+
+- name: Ensure quadlet directory exists
+  become: true
+  ansible.builtin.file:
+    path: "{{ pulp_quadlet_dir }}"
+    state: directory
+    mode: '0600'
+    owner: root
+    group: root
+  when: pulp_quadlet_dir != "/etc/containers/systemd/"
+
+- name: Ensure network exists
+  become: true
+  containers.podman.podman_network:
+    name: "{{ pulp_network }}"
+    internal: "{{ pulp_network_internal|bool }}"
+    state: quadlet
+    quadlet_dir: "{{ pulp_quadlet_dir }}"
+  notify:
+     - Reload Pulp API
+     - Reload Pulp Content
+     - Reload Pulp Worker
+
+- name: Ensure secret for secretkey is defined
+  become: true
+  no_log: true
+  containers.podman.podman_secret:
+    state: present
+    name: "{{ pulp_secret_secretkey }}"
+    data: "{{ pulp_secretkey }}"
+  notify:
+     - Reload Pulp API
+     - Reload Pulp Content
+     - Reload Pulp Worker
+
+- name: Ensure valkey container exists
+  no_log: true
+  ansible.builtin.include_role:
+    name: "fossgalaxy.infra.valkey"
+  vars:
+    valkey_service: "{{ pulp_cache_service }}"
+    valkey_network: "{{ pulp_network }}.network"
+    valkey_systemd_dir: "{{ pulp_quadlet_dir }}"
+  when: pulp_cache | bool
+
+- name: Ensure API container exists
+  become: true
+  containers.podman.podman_container:
+    name: "{{ pulp_api_service }}"
+    image: "{{ pulp_api_image }}"
+    network: "{{ pulp_network }}.network"
+    state: quadlet
+    quadlet_dir: "{{ pulp_quadlet_dir }}"
+    env: "{{ pulp_django_env | combine(pulp_api_extra_env) }}"
+    secrets: "{{ pulp_django_secrets + pulp_api_extra_secrets }}"
+    volumes: "{{ pulp_django_volumes + pulp_api_extra_volumes }}"
+    label: "{{ pulp_api_extra_labels }}"
+    quadlet_options: "{{ pulp_django_quadlet_options + pulp_api_extra_quadlet_options }}"
+  notify:
+    - Reload Pulp API
+
+- name: Ensure content container exists
+  become: true
+  containers.podman.podman_container:
+    name: "{{ pulp_content_service }}"
+    image: "{{ pulp_content_image }}"
+    network: "{{ pulp_content_network }}.network"
+    state: quadlet
+    quadlet_dir: "{{ pulp_quadlet_dir }}"
+    env: "{{ pulp_django_env | combine(pulp_content_extra_env) }}"
+    secrets: "{{ pulp_django_secrets + pulp_content_extra_secrets }}"
+    volumes: "{{ pulp_django_volumes + pulp_content_extra_volumes }}"
+    label: "{{ pulp_content_extra_labels }}"
+    quadlet_options: "{{ pulp_django_quadlet_options + pulp_content_extra_quadlet_options }}"
+  notify:
+    - Reload Pulp Content
+ 
+- name: Ensure worker container exists
+  become: true
+  containers.podman.podman_container:
+    name: "{{ pulp_worker_service }}"
+    image: "{{ pulp_worker_image }}"
+    network: "{{ pulp_worker_network }}.network"
+    state: quadlet
+    quadlet_dir: "{{ pulp_quadlet_dir }}"
+    env: "{{ pulp_django_env | combine(pulp_worker_extra_env) }}"
+    secrets: "{{ pulp_django_secrets + pulp_worker_extra_secrets }}"
+    volumes: "{{ pulp_django_volumes + pulp_worker_extra_volumes }}"
+    label: "{{ pulp_worker_extra_labels }}"
+    quadlet_options: "{{ pulp_django_quadlet_options + pulp_worker_extra_quadlet_options }}"
+  notify:
+    - Reload Pulp Worker
