@@ -21,6 +21,9 @@ install:
         pytest \
         pytest-ansible
 
+dist:
+  ansible-galaxy collection build
+
 # ------------------------------------------------------------
 # Linting
 # ------------------------------------------------------------
