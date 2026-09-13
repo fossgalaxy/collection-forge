@@ -14,13 +14,14 @@
     env: "{{ pulp_django_env | combine(pulp_api_extra_env) | combine(pulp_bootstrap_env) }}"
     secrets: "{{ pulp_django_secrets + pulp_api_extra_secrets }}"
     volumes: "{{ pulp_oneshot_volumes + pulp_api_extra_volumes }}"
-    command: [ "set_init_password.sh" ]
+    command: ["set_init_password.sh"]
   when: pulp_admin_password is defined
 
 # TODO we need to handle the signing service
 # see https://github.com/pulp/pulp-oci-images/blob/latest/images/assets/add_signing_service.sh
 - name: Generate certs for token service
   become: true
+  when: pulp_token_gencerts | bool
   block:
     - name: Ensure private key exists
       community.crypto.openssl_privatekey:
@@ -37,4 +38,3 @@
         format: PEM
         owner: "{{ pulp_uid }}"
         mode: "0644"
-  when: pulp_token_gencerts | bool

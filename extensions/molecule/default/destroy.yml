@@ -1,5 +1,6 @@
 ---
-- hosts: localhost
+- name: Cleanup the run
+  hosts: localhost
   gather_facts: false
   tasks:
     - name: Destroy the resources

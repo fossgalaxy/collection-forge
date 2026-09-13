@@ -10,7 +10,10 @@ forgejo_runner_method: binary
 forgejo_runner_engine: podman
 
 # runner: binary
-forgejo_runner_download: "https://code.forgejo.org/forgejo/runner/releases/download/v{{ forgejo_runner_version }}/forgejo-runner-{{ forgejo_runner_version }}-{{ forgejo_runner_os }}-{{ forgejo_runner_arch }}"
+forgejo_runner_download_tag: >
+  v{{ forgejo_runner_version }}/
+  forgejo-runner-{{ forgejo_runner_version }}-{{ forgejo_runner_os }}-{{ forgejo_runner_arch }}
+forgejo_runner_download: "https://code.forgejo.org/forgejo/runner/releases/download/{{ forgejo_runner_download_tag }}"
 forgejo_runner_checksum: "{{ forgejo_runner_download }}.sha256"
 forgejo_runner_path: "/usr/local/bin/forgejo-runner"
 

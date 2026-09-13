@@ -1,7 +1,7 @@
 ---
 # Customisation hooks
 
-- name: customise | Ensure customisation folders exist
+- name: podman_customise | Ensure customisation folders exist
   become: true
   ansible.builtin.file:
     dest: "{{ item }}"
@@ -24,7 +24,7 @@
     - "{{ forgejo_custom_dir }}/options/locales"
     - "{{ forgejo_custom_dir }}/options/readme"
 
-- name: customise | Copy custom label sets
+- name: podman_customise | Copy custom label sets
   become: true
   ansible.builtin.copy:
     src: "{{ item }}"
@@ -37,7 +37,7 @@
   notify:
     - Restart Forgejo
 
-- name: customise | Copy custom licences
+- name: podman_customise | Copy custom licences
   become: true
   ansible.builtin.copy:
     src: "{{ item }}"
@@ -50,7 +50,7 @@
   notify:
     - Restart Forgejo
 
-- name: customise | Copy custom assets
+- name: podman_customise | Copy custom assets
   become: true
   ansible.builtin.copy:
     src: "{{ item.value }}"
@@ -63,7 +63,7 @@
   notify:
     - Restart Forgejo
 
-- name: customise | Copy custom templates
+- name: podman_customise | Copy custom templates
   become: true
   ansible.builtin.copy:
     src: "{{ item.value }}"

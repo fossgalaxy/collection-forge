@@ -1,7 +1,7 @@
 ---
 # Configuration
 
-- name: install | Ensure configuration folder exists
+- name: podman_configure | Ensure configuration folder exists
   become: true
   ansible.builtin.file:
     dest: "{{ item }}"
@@ -14,7 +14,7 @@
     - "{{ forgejo_custom_dir }}"
     - "{{ forgejo_custom_dir }}/conf"
 
-- name: install | Provide customised forgejo config
+- name: podman_configure | Provide customised forgejo config
   become: true
   ansible.builtin.template:
     src: app.ini.j2

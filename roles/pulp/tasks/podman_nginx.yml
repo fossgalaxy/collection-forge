@@ -38,7 +38,7 @@
   containers.podman.podman_container:
     name: "{{ pulp_web_service }}"
     image: "{{ pulp_web_image }}"
-    command: [ "/usr/bin/nginx.sh" ]
+    command: ["/usr/bin/nginx.sh"]
     network: "{{ pulp_network }}.network"
     state: quadlet
     quadlet_dir: "{{ pulp_quadlet_dir }}"
@@ -48,4 +48,3 @@
     quadlet_options: "{{ pulp_web_quadlet_options + pulp_web_extra_quadlet_options }}"
   notify:
     - Reload Pulp Web
-

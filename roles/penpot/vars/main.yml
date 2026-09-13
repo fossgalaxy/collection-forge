@@ -5,7 +5,7 @@
 penpot_resolved_flags: >-
   {{
     penpot_default_flags +
-     ( penpot_oid | bool ) 
+     ( penpot_oid | bool )
      | ternary( [ "enable-login-with-oidc" ], [] )
   }}
 
@@ -149,4 +149,3 @@ penpot_exporter_quadlet_options:
     Requires={{ penpot_valkey_service }}.container
     [Install]
     WantedBy={{ penpot_be_quadlet_wanted_by }}
-

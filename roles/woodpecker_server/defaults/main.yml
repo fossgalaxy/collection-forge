@@ -17,7 +17,9 @@ woodpecker_server_db_user: "woodpecker_app"
 
 woodpecker_server_db_user_pass: "{{ woodpecker_server_db_user }}:{{ woodpecker_server_db_password }}"
 
-woodpecker_server_db_dsn: "postgres://{{ woodpecker_server_db_user_pass }}@{{ woodpecker_server_db_host }}/{{ woodpecker_server_db_name }}?sslmode=disable"
+woodpecker_server_db_dsn: >
+  postgres://{{ woodpecker_server_db_user_pass }}@{{ woodpecker_server_db_host }}/
+  {{ woodpecker_server_db_name }}?sslmode=disable
 
 # web details
 woodpecker_server_domain: "{{ inventory_hostname }}"

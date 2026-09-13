@@ -11,7 +11,7 @@ pulp_url: "https://{{ pulp_domain }}"
 pulp_secretkey: ""
 pulp_encyption_key: "DNmNdwgyZugTax9S64J0FITTr9IHPxbuoF1F1CGPr68=" # default from pulp repo
 
-#pulp_admin_password: "password"
+# pulp_admin_password: "password"
 
 # feature: token server
 pulp_tokens: true

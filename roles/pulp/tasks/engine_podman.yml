@@ -30,9 +30,9 @@
     mode: '0400'
     setype: container_file_t
   notify:
-     - Reload Pulp API
-     - Reload Pulp Content
-     - Reload Pulp Worker
+    - Reload Pulp API
+    - Reload Pulp Content
+    - Reload Pulp Worker
 
 - name: Ensure data volume exists
   become: true
@@ -55,13 +55,13 @@
   become: true
   containers.podman.podman_network:
     name: "{{ pulp_network }}"
-    internal: "{{ pulp_network_internal|bool }}"
+    internal: "{{ pulp_network_internal | bool }}"
     state: quadlet
     quadlet_dir: "{{ pulp_quadlet_dir }}"
   notify:
-     - Reload Pulp API
-     - Reload Pulp Content
-     - Reload Pulp Worker
+    - Reload Pulp API
+    - Reload Pulp Content
+    - Reload Pulp Worker
 
 - name: Ensure secret for secretkey is defined
   become: true
@@ -71,9 +71,9 @@
     name: "{{ pulp_secret_secretkey }}"
     data: "{{ pulp_secretkey }}"
   notify:
-     - Reload Pulp API
-     - Reload Pulp Content
-     - Reload Pulp Worker
+    - Reload Pulp API
+    - Reload Pulp Content
+    - Reload Pulp Worker
 
 # we need to ensure all the container data is setup for bootstrap...
 - name: Ensure podman database is setup
@@ -98,7 +98,7 @@
   containers.podman.podman_container:
     name: "{{ pulp_api_service }}"
     image: "{{ pulp_api_image }}"
-    command: [ "pulp-api" ]
+    command: ["pulp-api"]
     network: "{{ pulp_network }}.network"
     state: quadlet
     quadlet_dir: "{{ pulp_quadlet_dir }}"
@@ -115,7 +115,7 @@
   containers.podman.podman_container:
     name: "{{ pulp_content_service }}"
     image: "{{ pulp_content_image }}"
-    command: [ "pulp-content" ]
+    command: ["pulp-content"]
     network: "{{ pulp_network }}.network"
     state: quadlet
     quadlet_dir: "{{ pulp_quadlet_dir }}"
@@ -126,13 +126,13 @@
     quadlet_options: "{{ pulp_django_quadlet_options + pulp_content_extra_quadlet_options }}"
   notify:
     - Reload Pulp Content
- 
+
 - name: Ensure worker container exists
   become: true
   containers.podman.podman_container:
     name: "{{ pulp_worker_service }}"
     image: "{{ pulp_worker_image }}"
-    command: [ "pulp-worker" ]
+    command: ["pulp-worker"]
     network: "{{ pulp_network }}.network"
     state: quadlet
     quadlet_dir: "{{ pulp_quadlet_dir }}"

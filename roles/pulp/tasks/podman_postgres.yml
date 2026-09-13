@@ -32,9 +32,9 @@
     name: "{{ pulp_secret_db_password }}"
     data: "{{ pulp_db_pw }}"
   notify:
-     - Reload Pulp API
-     - Reload Pulp Content
-     - Reload Pulp Worker
+    - Reload Pulp API
+    - Reload Pulp Content
+    - Reload Pulp Worker
 
 - name: Ensure secret for database encyption exists
   become: true
@@ -44,9 +44,9 @@
     name: "{{ pulp_secret_db_enckey }}"
     data: "{{ pulp_encyption_key }}"
   notify:
-     - Reload Pulp API
-     - Reload Pulp Content
-     - Reload Pulp Worker
+    - Reload Pulp API
+    - Reload Pulp Content
+    - Reload Pulp Worker
 
 - name: Run database migrations
   become: true

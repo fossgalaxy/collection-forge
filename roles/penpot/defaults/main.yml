@@ -58,9 +58,9 @@ penpot_telemetry_enabled: false
 penpot_telemetry_referer: "fossgalaxy-ansible"
 
 # we don't support deploying the mcp right now...
-#penpot_mcp: false
-#penpot_mcp_version: "{{ penpot_version }}"
-#penpot_mcp_image: "docker.io/penpotapp/mcp:{{ penpot_mcp_version }}"
+# penpot_mcp: false
+# penpot_mcp_version: "{{ penpot_version }}"
+# penpot_mcp_image: "docker.io/penpotapp/mcp:{{ penpot_mcp_version }}"
 
 # Integration: OpenID
 penpot_oid_meta_url: ""
@@ -195,7 +195,7 @@ penpot_be_service: "{{ penpot_service_prefix }}-backend"
 
 # what should trigger us?
 penpot_be_quadlet_wanted_by: "{{ penpot_quadlet_wanted_by }}"
-penbot_be_allowed_hosts: []
+penpot_be_allowed_hosts: []
 
 # container spesific overrides
 penpot_be_extra_env: "{{ penpot_extra_env }}"
