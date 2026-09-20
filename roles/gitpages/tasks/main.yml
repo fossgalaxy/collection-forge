@@ -1,0 +1,11 @@
+---
+
+- name: Validate runner provider
+  ansible.builtin.assert:
+    that:
+      - gitpages_runner_engine in ['podman']
+    fail_msg: "unsupported engine"
+  changed_when: false
+
+- name: Include engine tasks
+  ansible.builtin.include_tasks: "engine_{{ gitpages_runner_engine }}.yml"

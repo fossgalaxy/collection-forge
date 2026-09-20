@@ -1,0 +1,62 @@
+---
+# defaults file for forgejo runner
+
+# version information
+gitpages_version: "latest"
+gitpages_image: "codeberg.org/git-pages/git-pages:{{ gitpages_version }}"
+
+gitpages_runner_engine: podman
+gitpages_service: "gitpages"
+
+gitpages_bind_user: root
+gitpages_bind_group: root
+
+# where should we dump the config?
+gitpages_bind_dir: "/srv/podman/{{ gitpages_service }}/"
+gitpages_bind_conf: "{{ gitpages_bind_dir }}/config.toml"
+
+# where should we store the data?
+gitpages_storage_type: fs
+gitpages_storage_volume: "{{ gitpages_service }}_data"
+
+gitpages_forge_domain: "code.example.com"
+gitpages_forge_url: "https://{{ gitpages_forge_domain }}"
+
+# reverse proxy config
+gitpages_traefik: true
+gitpages_traefik_labels: >-
+  {{
+    (
+      {'traefik.enable': 'true'}
+    ) | combine(
+          (forgejo_traefik | default(true) | bool)
+          | ternary(
+              ([
+                {
+                  'key': 'traefik.http.routers.' ~ gitpages_service ~ '.rule',
+                  'value': 'Host(`' ~ gitpages_wildcard_domain ~ '`) || HostRegexp(`{subdomain:[a-z0-9]+}.' ~ gitpages_wildcard_domain ~ '`)'
+                },
+                {
+                  'key': 'traefik.http.services.' ~ gitpages_service ~ '.loadbalancer.server.port',
+                  'value': '3000'
+                }
+              ] | ansible.builtin.items2dict),
+              {}
+          )
+      )
+  }}
+
+
+# gitpages wildcard support
+gitpages_wildcard: "{{ gitpages_wildcard_domain | length > 0 }}"
+gitpages_wildcard_auth: forgejo
+gitpages_wildcard_domain: "example.org"
+gitpages_wildcard_clone_url: "{{ gitpages_forge_url }}/<user>/<project>.git"
+gitpages_wildcard_repo: "<user>.{{ gitpages_wildcard_domain }}"
+gitpages_wildcard_repo_branch: "pages"
+
+gitpages_extra_env: {}
+gitpages_extra_volumes: []
+gitpages_extra_secrets: []
+gitpages_extra_labels: {}
+gitpages_extra_quadlet_options: []

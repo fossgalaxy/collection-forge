@@ -1,0 +1,18 @@
+---
+
+gitpages_volumes: >-
+  {{
+    [
+      gitpages_storage_volume ~ ".volume:/app/data"
+    ]
+  }}
+
+gitpages_env: {}
+gitpages_secrets: []
+gitpages_quadlet_options: []
+
+gitpages_labels: >-
+  {{
+    (gitpages_traefik | bool)
+    | ternary(gitpages_traefik_labels, {})
+  }}
