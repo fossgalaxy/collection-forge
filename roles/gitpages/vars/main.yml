@@ -3,7 +3,8 @@
 gitpages_volumes: >-
   {{
     [
-      gitpages_storage_volume ~ ".volume:/app/data"
+      gitpages_storage_volume ~ ".volume:/app/data",
+      gitpages_bind_conf ~ ":/app/config.toml:ro,Z"
     ]
   }}
 
