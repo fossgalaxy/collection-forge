@@ -29,12 +29,12 @@ gitpages_traefik_labels: >-
     (
       {'traefik.enable': 'true'}
     ) | combine(
-          (forgejo_traefik | default(true) | bool)
+          (gitpages_traefik | default(true) | bool)
           | ternary(
               ([
                 {
                   'key': 'traefik.http.routers.' ~ gitpages_service ~ '.rule',
-                  'value': 'Host(`' ~ gitpages_wildcard_domain ~ '`) || HostRegexp(`{subdomain:[a-z0-9]+}.' ~ gitpages_wildcard_domain ~ '`)'
+                  'value': 'Host(`' ~ gitpages_wildcard_domain ~ '`) || HostRegexp(`^[a-z0-9]+[.]' ~ (gitpages_wildcard_domain | replace(".", "[.]")) ~ '$`)'
                 },
                 {
                   'key': 'traefik.http.services.' ~ gitpages_service ~ '.loadbalancer.server.port',
